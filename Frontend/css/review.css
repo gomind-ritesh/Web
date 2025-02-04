@@ -1,0 +1,92 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #F8EFBA;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .contact-container {
+    display: flex;
+    flex-direction: row-reverse; /* Places the review text on the left and the form on the right */
+    justify-content: space-between;
+    padding: 40px;
+  }
+  
+  .review-section {
+    width: 40%;
+    padding-right: 50px;
+  }
+  
+  .review-section h1 {
+    font-size: 36px;
+    color: #4A3C2A;
+    margin-bottom: 20px;
+  }
+  
+  .review-section p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .form-section {
+    width: 50%;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    width:50%
+  }
+  
+  label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  input, select, textarea {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+  }
+  
+  textarea {
+    height: 100px;
+  }
+  
+  button {
+    padding: 15px;
+    background-color: #ccc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  
+  button:hover {
+    background-color: #6A5A46;
+  }
+  
+  /* Responsive Design for smaller screens */
+  @media (max-width: 768px) {
+    .contact-container {
+      flex-direction: column;
+    }
+  
+    .review-section, .form-section {
+      width: 100%;
+      padding: 0;
+    }
+  
+    .review-section {
+      padding-bottom: 30px;
+    }
+
+   
+  }
+  

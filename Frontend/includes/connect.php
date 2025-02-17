@@ -1,8 +1,8 @@
 <?php
 
 $server_name = "localhost";
-$user_name = "ritesh";
-$password = "1277";
+$user_name = "root";
+$password = "";
 $db_name = "red_lantern";
 //$conn = mysqli_connect($server_name ,$user_name,$password , $db_name);
 try

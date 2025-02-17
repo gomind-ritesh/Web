@@ -25,7 +25,80 @@ if(!isset($_SESSION['username']))
   <link rel="stylesheet" href="css/review.css"> 
   <link rel="stylesheet" href="css/mystyle.css">
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+  <script>
+  $(document).ready(function(){
+	$("button#showOrder").click(function(){
+		$("div.order_details").fadeToggle();
+    $("#selectedOrderDiv").fadeOut();
+	});
+	$("button#hideOrder").click(function(){
+		$("div.order_details").fadeToggle();
+    $("#selectedOrderDiv").fadeIn();
+	});
+
+  $("#tableOrder tr").css("background-color", "#FFFFFF");
+
+	$(document).on("click", "#tableOrder tbody tr", function(){
+    $("#tableOrder tr").css("background-color", "#FFFFFF");
+    $(this).css("background-color", "#D4E1D4");
+    //     var valueclicked = $(this).children('td.fullvalue').text();
+    //     //alert(valueclicked);
+    //     //Let us set the hidden field to the full value
+    //     $("#txt_visit").val(valueclicked) ;
+    //     //alert("You clicked " + $(this).children('td.fullvalue').text());
+    // });
+
+    var bill_id = $(this).children("td:eq(0)").text();
+    var bill_date = $(this).children("td:eq(1)").text();
+    var sum_item_qty = $(this).children("td:eq(2)").text();
+    var sum_item_total_price = $(this).children("td:eq(3)").text();
+
+    // // (Optional) Still set the hidden field if needed for your server-side processing.
+    // var fullValue = $(this).children("td.fullvalue").text();
+    // var parts = fullValue.split("|");
+    // // Assign parts to variables
+    // var house_id  = parts[0];
+    // var a_address   = parts[1];  // for display purposes
+    // var a_owner     = parts[2];  // for display purposes
+    // var a_price     = parts[3];  // for display purposes
+    // var a_dateFrom  = parts[4];
+    // var a_dateTo    = parts[5];
+    // var renter_id = parts[6];
+
+    // Update the new div with the selected visit details.
+    $("#sel_bill_id").text(bill_id);
+    $("#sel_bill_date").text(bill_date);
+    $("#sel_sum_item_qty").text(sum_item_qty);
+    $("#sel_sum_item_total_price").text(sum_item_total_price);
+
+    $("#txt_bill_id").val(bill_id);
+    $("#txt_bill_date").val(bill_date);
+    $("#txt_item_qty").val(sum_item_qty);
+    $("#txt_sum_item_total_price").val(sum_item_total_price);
+
+    // (Optional) You can still set the old hidden field if needed:
+    // $("#txt_visit").val(fullValue);
+
+    // Show the selected visit div
+    // $("#selectedVisitDiv").fadeIn();
+
+});
+
+    /* alternative syntax usually used for items that are not available when the document has loaded (when using ajax)
+    $(document).on("click", "#tableVisit tbody tr", function() {
+    	$("#tableVisit tr").css("background-color", "#EEEEEE");
+    	$(this).css("background-color", "yellow");
+        var valueclicked = $(this).children('td.fullvalue').text();
+        //alert(valueclicked);
+        //Let us set the hidden field to the full value
+        $("#txt_visit").val(valueclicked) ;
+        //alert("You clicked " + $(this).children('td.fullvalue').text());
+    }); */
+
+});
+</script>
   
 <?php
     // currently on review page
@@ -76,10 +149,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
 
   if($ratingErr == "" && $commentErr ==  "")
     {
-      $bill = $_POST["txt_bill"];
-    #echo $visit;
-    #Let us split the string according to |
-    list($bill_id, $bill_date, $user_id) = explode( "|", $bill);
+    $bill_id = $_POST["txt_bill_id"];
+    $bill_date = $_POST["txt_bill_date"];
+    $sum_item_qty = $_POST["txt_sum_item_qty"];
+    $total_sum_item_total_price = $_POST["txt_sum_item_total_price"];
+    //   $bill = $_POST["txt_bill"];
+    // #echo $visit;
+    // #Let us split the string according to |
+    // list($bill_id, $bill_date, $user_id) = explode( "|", $bill);
 
       $Msg = "";
       require_once "includes/db_connect.php";
@@ -168,19 +245,83 @@ require_once "includes/db_connect.php";
     <div class="form-section">
     <form  method="post" action="<?php echo $_SERVER["PHP_SELF"];?>" >
 
-        Choose the bill you want to rate: <br/>
-        <select name="txt_bill">
-        <?php
-          while ($row = $showResult->fetch()) {
-          $str = "";
-          $str = $str . $row['bill_id'] . "|";
-          $str = $str . $row['bill_date'] . "|";
-          $str = $str . $row['user_id'] ;
-          echo "<option value = '$str'>$str</option>";
-          }//end while
+    <button id="showOrder" type="button">Click here to choose the bill you want to rate </button>
+      <div class="order_details" style="display:none;background-color:#FFF5E1">
+      <h3 style="text-align: center">Click a row to select a bill to rate</h3>
+        <table id="tableOrder" style="width: 450px">
+      <thead>
+      <tr>
+      	<th>Bill ID</th>
+      	<th>Bill Date</th>
+      	<th>Total Number of Items</th>
+      	<th>Total Price</th>
+      	<th></th>
+      </tr>
+    </thead>
+      <?php
+      	while ($row = $showResult->fetch()) {
+
+      	// $str = "";
+      	// $str = $str. $row['bill_id'] . "|";
+      	// $str = $str. $row['bill_date'] . "|";
+      	// $str = $str . $row['sum_item_qty'] . "|";
+      	// $str = $str . $row['sum_item_total_price'] ;
+      	echo "<tr>";
+      	echo "<td style=\"text-align: center\">" . $row['bill_id'] . "</td>";
+      	echo "<td style=\"text-align: center\">" . $row['bill_date'] . "</td>";
+      	echo "<td style=\"text-align: center\">" . $row['sum_item_qty'] . "</td>";
+      	echo "<td style=\"text-align: center\">" . $row['sum_item_total_price'] . "</td>";
+      	// echo "<td style='display:none' class='fullvalue'>". $str . "</td>";
+      	echo "</tr>";
+      	}//end while
+      ?>
+      </table></br>
+      <button type="button" id="hideOrder" style="float:right;">Done choosing</button>
+      </div>
+
+      <input type="hidden" name="txt_bill_id" id="txt_bill_id">
+      <input type="hidden" name="txt_bill_date" id="txt_bill_date">
+      <input type="hidden" name="txt_sum_item_qty" id="txt_sum_item_qty">
+      <input type="hidden" name="txt_sum_item_total_price" id="txt_sum_item_total_price">
+
+      <!-- <input type="hidden" name="txt_visit" id="txt_visit"> -->
+
+      <div id="selectedOrderDiv" style="display:none; background-color:#FFF5E1; padding:10px; margin-top:10px;">
+
+  <h3 style="text-align: center">Selected Bill Details</h3>
+  <table border="1" style="width: 400px;">
+    <tr>
+      <th>Bill ID</th>
+      <td id="sel_bill_id" style="text-align: center"></td>
+    </tr>
+    <tr>
+      <th>Bill Date</th>
+      <td id="sel_bill_date" style="text-align: center"></td>
+    </tr>
+    <tr>
+      <th>Total Number of Items</th>
+      <td id="sel_sum_item_qty" style="text-align: center"></td>
+    </tr>
+    <tr>
+      <th>Total Price</th>
+      <td id="sel_sum_item_total_price" style="text-align: center"></td>
+    </tr>
+  </table>
+      </div><br/>
+
+      <br/>
+        <!-- <select name="txt_bill">
+         <?php 
+          // while ($row = $showResult->fetch()) {
+          // $str = "";
+          // $str = $str . $row['bill_id'] . "|";
+          // $str = $str . $row['bill_date'] . "|";
+          // $str = $str . $row['user_id'] ;
+          // echo "<option value = '$str'>$str</option>";
+          // }//end while
           
-         ?>
-        </select></br>
+          ?> 
+        </select></br> -->
 
         
         <label for="txt_rating" >Rating</label>
@@ -229,8 +370,9 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" && $ratingErr == "" && $commentErr ==  
 <body >
 
   <h2> <?php echo "Record Saved successfully"; ?></h2>
+            <a href= "home.php">Click me to go to home page</a>
 
-<body>
+</body>
 <?php
 }
 ?>

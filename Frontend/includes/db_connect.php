@@ -1,21 +1,6 @@
 <?php
-
-// $server_name = "localhost";
-// $user_name = "ritesh";
-// $password = "1277";
-// $db_name = "red_lantern";
-// //$conn = mysqli_connect($server_name ,$user_name,$password , $db_name);
-// try
-// {
-//  $conn = new PDO("mysql:host=$server_name;dbname=$db_name", $user_name, $password);
-// }
-// catch(PDOException $e)
-//  {
-//     echo  "<br>" . $e->getMessage();
-//     die;
-//  } 
  require_once "connect.php";
- 
+
  //functions to insert data in databasefunction insert_data_register($conn, $username, $firstname, $lastname, $phone, $password, $email) {
    function insert_data_register($conn, $username, $firstname, $lastname, $phone, $password, $email) {
     
@@ -278,11 +263,13 @@ function bill_id_show($conn, $username)
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Query to fetch bill details of user
-$sQuery = "SELECT b.bill_id, b.bill_date, b.user_id
+$sQuery = "SELECT b.bill_id, b.bill_date, SUM(bf.item_qty) AS sum_item_qty, SUM(bf.item_total_price) AS sum_item_total_price
 FROM bill b
-JOIN user u ON u.user_id = b.user_id
+JOIN bill_food_details bf ON bf.bill_id = b.bill_id
+JOIN user u ON b.user_id = u.user_id
 WHERE b.reviewed = 0
-AND user_name = :username;";
+AND u.user_name = :username
+GROUP BY b.bill_id, b.bill_date;";
 
 $stmt = $conn->prepare($sQuery);
 

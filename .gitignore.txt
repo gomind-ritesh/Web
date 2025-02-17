@@ -1,2 +1,2 @@
-# Admin\includes\connect.php
-# Frontend\includes\connect.php
+Admin\includes\connect.php
+Frontend\includes\connect.php

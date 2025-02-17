@@ -244,7 +244,11 @@ require_once "includes/db_connect.php";
     <!-- Right Side: Form -->
     <div class="form-section">
     <form  method="post" action="<?php echo $_SERVER["PHP_SELF"];?>" >
+      <?php
+          require_once "includes/db_connect.php";
 
+          $showResult = bill_id_show($conn, $_SESSION['username']);
+        ?>
     <button id="showOrder" type="button">Click here to choose the bill you want to rate </button>
       <div class="order_details" style="display:none;background-color:#FFF5E1">
       <h3 style="text-align: center">Click a row to select a bill to rate</h3>

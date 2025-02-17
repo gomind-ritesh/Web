@@ -1,2 +1,0 @@
-Admin\includes\connect.php
-Frontend\includes\connect.php

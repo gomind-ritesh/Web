@@ -8,8 +8,9 @@ body {
   .contact-container {
     display: flex;
     flex-direction: row-reverse; /* Places the review text on the left and the form on the right */
-    justify-content: space-between;
-    padding: 40px;
+    justify-content: center;
+    padding: 5em;
+    gap: 10em;
   }
   
   .review-section {
@@ -17,7 +18,7 @@ body {
     padding-right: 50px;
   }
   
-  .review-section h1 {
+  /* .review-section h1 {
     font-size: 36px;
     color: #4A3C2A;
     margin-bottom: 20px;
@@ -27,40 +28,40 @@ body {
     font-size: 16px;
     color: #666;
     margin-bottom: 10px;
-  }
+  } */
   
-  .form-section {
-    width: 80%;
-  }
+  /* .form-section {
+    width: 57.5%;
+  } */
   
   form {
     display: flex;
     flex-direction: column;
-    width:50%
+    width:100%
   }
   
-  label {
+  /* label {
     font-size: 14px;
     margin-bottom: 5px;
     color: #333;
-  }
+  } */
   
-  input, select, textarea {
+  /* input, select, textarea {
     padding: 10px;
     margin-bottom: 20px;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 16px;
     width: 100%;
-  }
+  } */
   
-  textarea {
+  /* textarea {
     height: 100px;
-  }
+  } */
   
   button {
     padding: 15px;
-    background-color: #ccc;
+    background-color: #09151e;
     color: white;
     border: none;
     border-radius: 5px;
@@ -69,22 +70,54 @@ body {
   }
   
   button:hover {
-    background-color: #6A5A46;
+    background-color: #666;
   }
 
   button#showOrder {
     padding: 15px;
-    background-color: #ccc;
+    background-color: #D98880;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
-    width: 450px;  /* Fixed width of the button */
+    width: 390px;  /* Fixed width of the button */
   }
 
   button#showOrder:hover {
-  background-color: #D98880;
+  background-color: #666;
+  }
+
+  select {
+    width: 50%;
+    /* padding: 10px; */
+    /* margin-bottom: 20px; */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color:#a4b0be;
+  }
+
+  textarea {
+    width: 100%;
+    height: 100px;
+    resize: none; /* Disable resizing */
+    box-sizing: border-box;
+    background-color:#a4b0be;
+    
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #09151e;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 16px;
+    color: #09151e;
+    line-height: 1.6;
+    margin-bottom: 30px;
   }
   
   /* Responsive Design for smaller screens */

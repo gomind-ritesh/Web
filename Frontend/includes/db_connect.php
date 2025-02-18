@@ -268,6 +268,7 @@ FROM bill b
 JOIN bill_food_details bf ON bf.bill_id = b.bill_id
 JOIN user u ON b.user_id = u.user_id
 WHERE b.reviewed = 0
+AND status = \"completed\"
 AND u.user_name = :username
 GROUP BY b.bill_id, b.bill_date;";
 

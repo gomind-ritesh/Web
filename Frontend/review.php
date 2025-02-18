@@ -38,8 +38,6 @@ if(!isset($_SESSION['username']))
     $("#selectedOrderDiv").fadeIn();
 	});
 
-  $("#tableOrder tr").css("background-color", "#FFFFFF");
-
 	$(document).on("click", "#tableOrder tbody tr", function(){
     $("#tableOrder tr").css("background-color", "#FFFFFF");
     $(this).css("background-color", "#D4E1D4");
@@ -75,7 +73,7 @@ if(!isset($_SESSION['username']))
 
     $("#txt_bill_id").val(bill_id);
     $("#txt_bill_date").val(bill_date);
-    $("#txt_item_qty").val(sum_item_qty);
+    $("#txt_sum_item_qty").val(sum_item_qty);
     $("#txt_sum_item_total_price").val(sum_item_total_price);
 
     // (Optional) You can still set the old hidden field if needed:
@@ -119,10 +117,20 @@ function test_input($data) {
   }
 
   // define error variables and set to empty values
-$ratingErr = $commentErr = "";
-$rating = $comment = "";
+$ratingErr = $commentErr = $billErr= "";
+$rating = $comment = $bill_id = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked after form data has been submitted
+   
+  if (empty($_POST["txt_bill_id"])) {
+    $billErr = "Please choose a Bill Order"; 
+  } else {
+    $bill_id = test_input($_POST["txt_bill_id"]);
+    if (!filter_var($bill_id, FILTER_VALIDATE_INT)) { 
+      $billErr = "Bill ID should be numeric";
+    }//end if
+
+  }//end else
 
   //Rating
   if (empty($_POST["txt_rating"])) {
@@ -147,12 +155,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
     
   }
 
-  if($ratingErr == "" && $commentErr ==  "")
+  if($ratingErr == "" && $commentErr ==  "" && $billErr == "")
     {
-    $bill_id = $_POST["txt_bill_id"];
-    $bill_date = $_POST["txt_bill_date"];
-    $sum_item_qty = $_POST["txt_sum_item_qty"];
-    $total_sum_item_total_price = $_POST["txt_sum_item_total_price"];
     //   $bill = $_POST["txt_bill"];
     // #echo $visit;
     // #Let us split the string according to |
@@ -207,7 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
 ?>
 
 <?php
- if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $ratingErr == "" && $commentErr ==  ""))
+ if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $ratingErr == "" && $commentErr ==  "" && $billErr == ""))
 {
 ?>
 
@@ -216,7 +220,7 @@ require_once "includes/db_connect.php";
 
   $showResult = bill_id_show($conn, $_SESSION['username']);
 
-    if (!($showResult->fetch()))
+    if (!($showResult->rowCount()>0))
    {
    	echo "<div><h3 style='color:red'>You have not ordered any food from us yet or have already reviewed all bills !!!!!</h3>";
     echo '<p><a href="home.php">Home</a></p></div>';
@@ -231,28 +235,23 @@ require_once "includes/db_connect.php";
 
 
   <div class="contact-container">
-    <!-- Left Side: Review Text -->
+    <!-- Right Side: Review Text -->
     <div class="review-section">
-      <h1>We would love to hear from you.</h1>
+      <h1>We would love to hear from you</h1>
       <p>
       It all begins with your experience. Whether you enjoyed a special night out, celebrated an important occasion, or simply had a great meal, we’d love to hear your thoughts. Your feedback helps us ensure that every guest has an exceptional dining experience. Share your comments about the food, ambiance, or service, and let us know how we can make your next visit even better.
       </p>
-      <p>redlantern@gmail.com</p>
-      <p>57382381</p>
+      <h4>Contact Info: </h4>
+      <p>redlantern@gmail.com<br> 57382381</p>
     </div>
 
     <!-- Right Side: Form -->
     <div class="form-section">
     <form  method="post" action="<?php echo $_SERVER["PHP_SELF"];?>" >
-      <?php
-          require_once "includes/db_connect.php";
-
-          $showResult = bill_id_show($conn, $_SESSION['username']);
-        ?>
     <button id="showOrder" type="button">Click here to choose the bill you want to rate </button>
       <div class="order_details" style="display:none;background-color:#FFF5E1">
       <h3 style="text-align: center">Click a row to select a bill to rate</h3>
-        <table id="tableOrder" style="width: 450px">
+        <table id="tableOrder" style="width: 395px">
       <thead>
       <tr>
       	<th>Bill ID</th>
@@ -293,7 +292,7 @@ require_once "includes/db_connect.php";
       <div id="selectedOrderDiv" style="display:none; background-color:#FFF5E1; padding:10px; margin-top:10px;">
 
   <h3 style="text-align: center">Selected Bill Details</h3>
-  <table border="1" style="width: 400px;">
+  <table border="1" style="width: 370px;">
     <tr>
       <th>Bill ID</th>
       <td id="sel_bill_id" style="text-align: center"></td>
@@ -311,9 +310,9 @@ require_once "includes/db_connect.php";
       <td id="sel_sum_item_total_price" style="text-align: center"></td>
     </tr>
   </table>
-      </div><br/>
+      </div> <span class="error">* <?php echo $billErr;?></span><br/>
 
-      <br/>
+
         <!-- <select name="txt_bill">
          <?php 
           // while ($row = $showResult->fetch()) {
@@ -337,15 +336,16 @@ require_once "includes/db_connect.php";
                         </option>
                     <?php endfor; ?>
         </select>
-        <span class="error">* <?php echo $ratingErr;?></span><br/><br/>
+        <span class="error">* <?php echo $ratingErr;?></span></br>
 
 
         <label for="txt_comment">Comment </label>
         <textarea id="txt_comment" name="txt_comment" ><?php echo $comment;?></textarea>
-        <span class="error">* <?php echo $commentErr;?></span><br/><br/>
+                    </br>
+        <span class="error"> <?php echo $commentErr;?></span>
 
 
-        <button type="submit">Submit</button>
+        <div style="width: 50px"><button type="submit">Submit</button></div>
       </form>
       <?php
    
@@ -366,7 +366,7 @@ require_once "includes/db_connect.php";
 
 //Add the codes to make sure that the message is only displayed when all the required fields are entered
 //post
-if( $_SERVER["REQUEST_METHOD"] == "POST" && $ratingErr == "" && $commentErr ==  "")
+if( $_SERVER["REQUEST_METHOD"] == "POST" && $ratingErr == "" && $commentErr ==  "" && $billErr == "")
 {
 
 ?>

@@ -175,5 +175,55 @@ function bill_details($conn, $bill_id)
    return $result;
 }   
 
+//functions to filter by highest price
+function greatestprice($conn)
+{
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sQuery = "SELECT u.user_name, b.bill_id, SUM(d.item_total_price) AS total_price, b.status, b.bill_date 
+    FROM bill b 
+    JOIN user u ON b.user_id = u.user_id
+    JOIN bill_food_details d ON b.bill_id = d.bill_id
+    GROUP BY u.user_name, b.bill_id, b.status, b.bill_date
+    ORDER BY total_price DESC
+    LIMIT 25"; // Get only the first 25 rows with the highest total_price
+
+   $stmt = $conn->prepare($sQuery);
+
+    // Execute the query
+   $stmt->execute();
+   
+   // Fetch the result (the highest price first)
+   $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+
+   // Return the result
+   return $result;
+}  
+
+//functions to filter by lowest price first
+function leastprice($conn)
+{
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sQuery = "SELECT u.user_name, b.bill_id, SUM(d.item_total_price) AS total_price, b.status, b.bill_date 
+    FROM bill b 
+    JOIN user u ON b.user_id = u.user_id
+    JOIN bill_food_details d ON b.bill_id = d.bill_id
+    GROUP BY u.user_name, b.bill_id, b.status, b.bill_date
+    ORDER BY total_price ASC
+    LIMIT 25"; // Get only the first 25 rows with the lowest total_price
+
+   $stmt = $conn->prepare($sQuery);
+
+    // Execute the query
+   $stmt->execute();
+   
+   // Fetch the result (the lowest price first)
+   $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+
+   // Return the result
+   return $result;
+}  
+
 ?>
 

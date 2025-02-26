@@ -11,11 +11,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="includes/style.css" />
-    <title>Responsive Dashboard Design #1 | Red Lantern</title>
+    <title>Reviews | Red Lantern</title>
   </head>
 
   <body>
   <?php 
-   $activemenu = "dashboard"; 
+   $activemenu = "reviews"; 
    include_once('includes/menu.php');
   ?>

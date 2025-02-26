@@ -16,15 +16,15 @@
 
         <div class="sidebar">
 
-          <a href="dashboard.php"
+          <a href="reviews.php"
           <?php 
 	  //In the codes below, we escape the inner double quotes, since they are to be included in the string"
-	  if ($activemenu=="dashboard")	
+	  if ($activemenu=="reviews")	
 		echo "class=\"active\"";
 	  ?>
 	>
-            <span class="material-icons-sharp"> dashboard </span>
-            <h3>Dashboard</h3>
+            <span class="material-icons-sharp"> reviews </span>
+            <h3>Reviews</h3>
           </a>
 
           <a href="index.php" <?php 
@@ -33,18 +33,38 @@
 		echo "class=\"active\"";
 	  ?>
 	>
-            <span class="material-icons-sharp"> insights </span>
-            <h3>Analytics</h3>
+            <span class="material-icons-sharp"> home </span>
+            <h3>Home</h3>
           </a>
 
-          <a href="sale.php" <?php 
+          <a href="foodmenu.php" <?php 
 	  //In the codes below, we escape the inner double quotes, since they are to be included in the string"
-	  if ($activemenu=="sale")	
+	  if ($activemenu=="foodmenu")	
 		echo "class=\"active\"";
 	  ?>
 	>
-            <span class="material-icons-sharp"> inventory </span>
-            <h3>Sale List</h3>
+            <span class="material-icons-sharp"> menu_book </span>
+            <h3>Food Menu</h3>
+          </a>
+
+          <a href="reservation.php" <?php 
+	  //In the codes below, we escape the inner double quotes, since they are to be included in the string"
+	  if ($activemenu=="reservation")	
+		echo "class=\"active\"";
+	  ?>
+	>
+            <span class="material-icons-sharp"> event_seat </span>
+            <h3>Reservation</h3>
+          </a>
+
+          <a href="deluser.php" <?php 
+	  //In the codes below, we escape the inner double quotes, since they are to be included in the string"
+	  if ($activemenu=="deluser")	
+		echo "class=\"active\"";
+	  ?>
+	>
+            <span class="material-icons-sharp"> group </span>
+            <h3>Users</h3>
           </a>
 
           <a href="register.php" <?php 

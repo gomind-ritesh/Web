@@ -36,7 +36,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
             // Function to fetch orders based on the selected filter
             function fetchOrders(filter, page = 1) {
                 $.ajax({
-                    url: "fetch_orders.php",
+                    url: "fetch_filter_orders.php",
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
@@ -130,11 +130,16 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
             // Default filter: Recent Orders
             fetchOrders("recent");
             // Retrieve the saved filter or default to "recent"
+
+//             Retrieve the Filter on Page Load
+// When the page loads, check if a filter is stored in localStorage and use it to fetch data:
             const selectedFilter = localStorage.getItem("selectedFilter") || "recent";
             $("#filterOptions").val(selectedFilter); // Set the dropdown to the saved filter
             fetchOrders(selectedFilter); // Fetch orders with the selected filter
 
             // Change event listener for filter selection
+//             Save the Selected Filter in localStorage
+// Update the filter dropdown change event to save the selected filter to localStorage:
             $("#filterOptions").change(function() {
                 var selectedFilter = $(this).val(); // Get selected filter option
                 localStorage.setItem("selectedFilter", selectedFilter); // Save to localStorage
@@ -339,14 +344,14 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
        $Msg = "";
        $updateResult = update_status_bill($conn, $status, $bill_id);
 
-    if (!$updateResult) {
-        $Msg = "ERROR: Record could not be saved!";
-        echo "<h3 class='error'>$Msg</h3>";
-    } else {
-        $Msg = "Record saved successfully!";
-        echo "<h3>$Msg</h3>";
-        // Optionally, redirect the user or clear the form here
-    }
+    // if (!$updateResult) {
+    //     $Msg = "ERROR: Record could not be saved!";
+    //     echo "<h3 class='error'>$Msg</h3>";
+    // } else {
+    //     $Msg = "Record saved successfully!";
+    //     echo "<h3>$Msg</h3>";
+    //     // Optionally, redirect the user or clear the form here
+    // }
        
     }//end if(strpos($key, 'chk_bill_id_')>=0)
   }//end foreach

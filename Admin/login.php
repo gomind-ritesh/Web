@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(isset($_SESSION['username']) && (isset($_SESSION['admin'])))
   { 
     echo "<h3 style=\"color:red\">You are already logged in</h3><br/>";
-    echo '<p><a href="index.php">Back to Analytics page</a></p>';
+    echo '<p><a href="index.php">Back to Home page</a></p>';
     // header("Location: index.php?referer=login");
     // die();
     

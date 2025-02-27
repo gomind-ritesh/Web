@@ -1,28 +1,30 @@
 
-   {/* Function to handle click event for "Details" links */}
-    document.querySelectorAll('.details-link').forEach(link => {
-    link.addEventListener('click', function (event) {
-      event.preventDefault(); // Prevent default link behavior
+  //  {/* Function to handle click event for "Details" links */}
+  //   document.querySelectorAll('.details-link').forEach(link => {
+  //   link.addEventListener('click', function (event) {
+  //     event.preventDefault(); // Prevent default link behavior
 
-      // Get the bill ID from the data attribute
-      const billId = this.getAttribute('data-bill-id');
+  //     // Get the bill ID from the data attribute
+  //     const billId = this.getAttribute('data-bill-id');
 
-      // Use AJAX to fetch the bill details
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', `fetch_bill_details.php?bill_id=${billId}`, true);
+  //     // Use AJAX to fetch the bill details
+  //     const xhr = new XMLHttpRequest();
+  //     xhr.open('GET', `fetch_bill_details.php?bill_id=${billId}`, true);
 
-      xhr.onload = function () {
-        if (xhr.status === 200) { //request successfull
-          // Insert the response (bill details) into the details container
-          document.getElementById('bill-details').innerHTML = xhr.responseText;
-        } else {
-          alert('Error fetching bill details.');
-        }
-      };
+  //     xhr.onload = function () {
+  //       if (xhr.status === 200) { //request successfull
+  //         // Insert the response (bill details) into the details container
+  //         document.getElementById('bill-details').innerHTML = xhr.responseText;
+  //       } else {
+  //         alert('Error fetching bill details.');
+  //       }
+  //     };
 
-      xhr.send();
-    });
-  });
+  //     xhr.send();
+  //   });
+  // });
+
+
 
 
 

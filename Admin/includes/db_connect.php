@@ -225,5 +225,66 @@ function leastprice($conn)
    return $result;
 }  
 
+//functions to get the first 5 latest bill id
+function user_bill_details($conn, $user_id)
+{
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sQuery = "SELECT u.user_name, b.bill_id, b.bill_date, b.status, SUM(d.item_total_price) AS total_price
+    FROM bill b 
+    JOIN user u ON b.user_id = u.user_id
+    JOIN bill_food_details d ON b.bill_id = d.bill_id
+    WHERE b.user_id=:user_id
+    GROUP BY u.user_name, b.bill_id, b.bill_date, b.status
+    ORDER BY b.bill_date DESC
+    LIMIT 5"; // Get only the first 5 rows with the latest bill_id
+
+   $stmt = $conn->prepare($sQuery);
+
+   $stmt->bindParam(":user_id", $user_id );
+
+    // Execute the query
+   $stmt->execute();
+   
+   // Fetch the result (the latest first 5 bill id)
+   $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+
+   // Return the result
+   return $result;
+}  
+
+//functions to update data in databasefunction ban($conn, $ban, $user_id)
+function ban_user($conn, $ban, $user_id) {
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    try {
+        $conn->beginTransaction(); // Start transaction
+
+        $deleteQuery = "UPDATE user SET `ban`= :ban WHERE user_id=:user_id";
+
+        $stmt = $conn->prepare($deleteQuery);
+
+        // Convert boolean to integer (0 or 1)
+        $ban = (int) $ban;
+        $stmt->bindParam(":ban", $ban);
+        $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        // Check if the row was deleted
+        if ($stmt->rowCount() > 0) {
+            $conn->commit(); // Commit transaction if successful
+            return true;
+        } else {
+            $conn->rollBack(); // Rollback if deletion failed
+            return false;
+        }
+    } catch (Exception $e) {
+        $conn->rollBack(); // Rollback in case of an error
+        return false;
+    }
+}
+
+
 ?>
 

@@ -285,6 +285,33 @@ function ban_user($conn, $ban, $user_id) {
     }
 }
 
+function review_bill_details($conn, $bill_id)
+{
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+   // Query to select all the rows pertaining to the bill details
+   $sQuery = "SELECT b.bill_id, f.food_name, d.item_qty, (d.item_qty * f.food_price) AS total_qty_price
+   FROM bill b 
+   JOIN bill_food_details d ON b.bill_id = d.bill_id
+   JOIN food f ON d.food_id = f.food_id
+   WHERE b.bill_id=:bill_id
+   ORDER BY food_name ASC"; 
+
+   $stmt = $conn->prepare($sQuery);
+
+   $stmt->bindParam(":bill_id", $bill_id );
+
+    // Execute the query
+   $stmt->execute();
+   
+   // Fetch the result 
+   $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+
+   // Return the result
+   return $result;
+}   
+
+
 
 ?>
 

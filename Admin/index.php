@@ -437,7 +437,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
             <option value="lowest">Lowest Price</option>
         </select></table></thead></tr></th></br></br>
 
-          <h2>Recent Orders</h2>
+          <h2>Orders</h2>
           <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
 
                <!-- Orders Table -->

@@ -537,13 +537,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
       <h2>Bill Details</h2>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>Food Name</th>
-                            <th>Food Quantity</th>
-                            <th>Food Price</th>
-                            <th></th>
-                        </tr>
+                        
                     </thead>
                     <tbody id="bill-details"></tbody>
                 </table>        

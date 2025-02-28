@@ -27,8 +27,7 @@ $orders = [];
 $totalPages = 1;
 
 if ($filter == "highest") {
-    $sQuery = "SELECT COUNT(*) AS total FROM bill b JOIN user u ON b.user_id = u.user_id
-               WHERE u.usertype = 'customer'";
+    $sQuery = "SELECT COUNT(*) AS total FROM bill b";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -38,14 +37,11 @@ if ($filter == "highest") {
                     FROM bill b 
                     JOIN user u ON b.user_id = u.user_id
                     JOIN bill_food_details d ON b.bill_id = d.bill_id
-                    WHERE u.usertype = 'customer'
                     GROUP BY u.user_name, b.bill_id, b.status, b.bill_date
                     ORDER BY total_price DESC 
                     LIMIT :perPage OFFSET :offset";
 } elseif ($filter == "lowest") {
-    $sQuery = "SELECT COUNT(*) AS total FROM bill b 
-               JOIN user u ON b.user_id = u.user_id
-               WHERE u.usertype = 'customer'";
+    $sQuery = "SELECT COUNT(*) AS total FROM bill b";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -55,12 +51,11 @@ if ($filter == "highest") {
                     FROM bill b 
                     JOIN user u ON b.user_id = u.user_id
                     JOIN bill_food_details d ON b.bill_id = d.bill_id
-                    WHERE u.usertype = 'customer'
                     GROUP BY u.user_name, b.bill_id, b.status, b.bill_date
                     ORDER BY total_price ASC 
                     LIMIT :perPage OFFSET :offset";
 } else {
-    $sQuery = "SELECT COUNT(*) AS total FROM bill b JOIN user u ON b.user_id = u.user_id WHERE u.usertype = 'customer' AND b.bill_date = (SELECT MAX(bill_date) FROM bill)";
+    $sQuery = "SELECT COUNT(*) AS total FROM bill b JOIN user u ON b.user_id = u.user_id WHERE b.bill_date = (SELECT MAX(bill_date) FROM bill)";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -70,8 +65,7 @@ if ($filter == "highest") {
                     FROM bill b 
                     JOIN user u ON b.user_id = u.user_id
                     JOIN bill_food_details d ON b.bill_id = d.bill_id
-                    WHERE u.usertype = 'customer' 
-                    AND b.bill_date = (SELECT MAX(bill_date) FROM bill)
+                    WHERE b.bill_date = (SELECT MAX(bill_date) FROM bill)
                     GROUP BY u.user_name, b.bill_id, b.status, b.bill_date
                     ORDER BY b.bill_id DESC
                     LIMIT :perPage OFFSET :offset";

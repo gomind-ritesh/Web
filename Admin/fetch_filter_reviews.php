@@ -13,8 +13,7 @@ if ($filter == "recent") {
     // Count total reviews
     $sQuery = "SELECT COUNT(DISTINCT r.review_id) AS total
                FROM reviews r 
-               JOIN user u ON r.user_id = u.user_id 
-               WHERE u.usertype = 'customer'";
+               JOIN user u ON r.user_id = u.user_id";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -25,15 +24,13 @@ if ($filter == "recent") {
                    FROM reviews r
                    JOIN user u ON r.user_id = u.user_id
                    JOIN bill b ON r.bill_id = b.bill_id
-                   WHERE u.usertype = 'customer'
                    ORDER BY r.review_id DESC
                    LIMIT :perPage OFFSET :offset";
 } elseif ($filter == "good_rating") {
     // Count total reviews
     $sQuery = "SELECT COUNT(DISTINCT r.review_id) AS total
                FROM reviews r 
-               JOIN user u ON r.user_id = u.user_id
-               WHERE u.usertype = 'customer'";
+               JOIN user u ON r.user_id = u.user_id";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -44,15 +41,13 @@ if ($filter == "recent") {
                    FROM reviews r
                    JOIN user u ON r.user_id = u.user_id
                    JOIN bill b ON r.bill_id = b.bill_id
-                   WHERE u.usertype = 'customer'
                    ORDER BY r.review_rating DESC
                    LIMIT :perPage OFFSET :offset";
 } elseif ($filter == "bad_rating") {
     // Count total reviews
     $sQuery = "SELECT COUNT(DISTINCT r.review_id) AS total
                FROM reviews r 
-               JOIN user u ON r.user_id = u.user_id
-               WHERE u.usertype = 'customer'";
+               JOIN user u ON r.user_id = u.user_id";
     $stmt = $conn->prepare($sQuery);
     $stmt->execute();
     $totalRows = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -63,7 +58,6 @@ if ($filter == "recent") {
                    FROM reviews r
                    JOIN user u ON r.user_id = u.user_id
                    JOIN bill b ON r.bill_id = b.bill_id
-                   WHERE u.usertype = 'customer'
                    ORDER BY r.review_rating ASC
                    LIMIT :perPage OFFSET :offset";
 } 

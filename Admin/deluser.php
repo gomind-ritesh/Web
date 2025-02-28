@@ -459,13 +459,13 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
           </div>
         </div>
       
-      <!-- Details pertaining to recent orders -->
+      <!-- Details pertaining to recent users -->
       <div class="bill-details">
-      <h2>Bill details-(5 Recent Max)</h2>
+      <h2>Bill Details-(5 Recent Max)</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>User name</th>
+                            <th>User Name</th>
                             <th>Bill ID</th>
                             <th>Bill Date</th>
                             <th>Status</th>

@@ -20,7 +20,7 @@ if (isset($_GET['user_id'])) {
     } // end if 
     else {
         echo "<tr><td colspan='4'>No details found for this user bill.</td></tr>";
-        // else{echo "<td>No details found for this bill.</td>";}
+        // else{echo "<td>No details found for this user bill.</td>";}
     }
 } else {
     echo "Invalid request.";

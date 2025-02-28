@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
 if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
@@ -31,33 +34,32 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
     <script>
         $(document).ready(function() {
-            // Function to fetch orders based on the selected filter
-            function fetchOrders(filter, page = 1) {
+            // Function to fetch reviews based on the selected filter
+            function fetchReviews(filter, page = 1) {
                 $.ajax({
-                    url: "fetch_orders.php",
+                    url: "fetch_filter_reviews.php",
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
                     success: function(response) {
-                      var tableBody = $("#recent-orders-table-body"); // Update the table body based on filter
+                      var tableBody = $("#recent-reviews-table-body"); // Update the table body based on filter
                         tableBody.empty(); // Clear existing rows
 
-                        const { orders, totalPages } = response;
+                        const { reviews, totalPages } = response;
 
-                        if (orders.length === 0) {
+                        if (reviews.length === 0) {
                     tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
                         } else {
-                            $.each(orders, function(index, bill) {
+                            $.each(reviews, function(index, review) {
                                 var row = `<tr>
-                                    <td>${bill.user_name}</td>
-                                    <td>${bill.bill_id}</td>
-                                    <td>${bill.bill_date}</td>
-                                    <td>${bill.total_price}</td>
-                                    <td style="color: ${getStatusColor(bill.status)}">${bill.status}</td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="active"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="completed"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="cancel"></td>
-                                    <td><a href="#" class="one details-link" data-bill-id="${bill.bill_id}">Details</a></td>                   
+                                    <td>${review.review_id}</td>
+                                    <td>${review.review_comment}</td>
+                                    <td style="color: ${getStatusColor(review.review_rating)}">${review.review_rating}</td>
+                                    <td>${review.user_name}</td>
+                                    <td>${review.bill_date}</td>
+                                    <td>${review.bill_id}</td>
+
+                                    <td><a href="#" class="one details-link" data-bill-id="${review.bill_id}">Details</a></td>                   
                                 </tr>`;  
                                 tableBody.append(row);
                             });
@@ -120,20 +122,15 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         $(".page-link").click(function (event) {
             event.preventDefault();
             var page = $(this).data("page");
-            fetchOrders($("#filterOptions").val(), page);
+            fetchReviews($("#filterOptions").val(), page);
         });
     }
 
+            fetchReviews("recent");
 
-            // Default filter: Recent Orders
-            fetchOrders("recent");
-            // Retrieve the saved filter or default to "recent"
-
-//             Retrieve the Filter on Page Load
-// When the page loads, check if a filter is stored in localStorage and use it to fetch data:
             const selectedFilter = localStorage.getItem("selectedFilter") || "recent";
             $("#filterOptions").val(selectedFilter); // Set the dropdown to the saved filter
-            fetchOrders(selectedFilter); // Fetch orders with the selected filter
+            fetchReviews(selectedFilter); // Fetch reviews with the selected filter
 
             // Change event listener for filter selection
 //             Save the Selected Filter in localStorage
@@ -141,14 +138,13 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
             $("#filterOptions").change(function() {
                 var selectedFilter = $(this).val(); // Get selected filter option
                 localStorage.setItem("selectedFilter", selectedFilter); // Save to localStorage
-                fetchOrders(selectedFilter);
+                fetchReviews(selectedFilter);
             });
 
-            // Function to return color based on order status
-            function getStatusColor(status) {
-                if (status === "cancel") return "#FF0060";
-                if (status === "completed") return "#1B9C85";
-                if (status === "active") return "#F7D060";
+            // Function to return color based on review status
+            function getStatusColor(rating) {
+                if (rating === 1) return "#FF0060";
+                if (rating === 5) return "#1B9C85";
                 return "black";
             }
         });
@@ -159,11 +155,11 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                 let billId = $(this).data('bill-id');
 
                 $.ajax({
-                    url: 'fetch_bill_details.php',
+                    url: 'fetch_review_bill_details.php',
                     type: 'GET',
                     data: { bill_id: billId },
                     success: function (response) {
-                        $('#bill-details').html(response);
+                        $('#review-bill-details').html(response);
                     },
                     error: function () {
                         alert('Error fetching bill details.');
@@ -204,7 +200,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     a.one:hover {color:blue;
         text-decoration: none;}
 
-    .right-section .user-details{
+    .right-section .bill-details{
     background-color: var(--color-white);
     width: 100%;
     padding: var(--card-padding);
@@ -215,26 +211,26 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     margin-top: 4rem;
     }
 
-    .right-section .user-details:hover{
+    .right-section .bill-details:hover{
         box-shadow: none;
     }
 
-    .right-section .user-details h2{
+    .right-section .bill-details h2{
         margin-bottom: 0.8rem;
     }
 
-    .right-section .user-details{
+    .right-section .bill-details{
         overflow-y: scroll; 
         max-height: 45%;   
     }
 
-    .right-section .user-details table tbody td{
+    .right-section .bill-details table tbody td{
         height: 2.8rem;
         border-bottom: 1px solid var(--color-light);
         color: var(--color-dark-variant);
     }
 
-     .right-section .user-details table tbody tr:last-child td{
+     .right-section .bill-details table tbody tr:last-child td{
         border: none;
     }
 
@@ -279,54 +275,8 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
   </head>
 
   <body>
-
-  <?php  
-// define variables and set to empty string values
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  require_once "includes/db_connect.php";
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $bill_id = "";
-  $status="";
-  foreach($_POST as $key => $value) {
-    if (strpos($key, 'rdo_bill_id_')>=0) {
-       $bill_id = substr($key, 12);
-       #echo $bill_id;
-       #echo $value;
-       
-       if($value == "cancel")
-       {
-       	$status = "cancel";
-       }
-       if($value == "completed")
-       {
-       	$status = "completed";
-       }
-       if($value == "active")
-       {
-       	$status = "active";
-       }
-       $Msg = "";
-       $updateResult = update_status_bill($conn, $status, $bill_id);
-
-    if (!$updateResult) {
-        $Msg = "ERROR: Record could not be saved!";
-        echo "<h3 class='error'>$Msg</h3>";
-    } else {
-        $Msg = "Record saved successfully!";
-        echo "<h3>$Msg</h3>";
-        // Optionally, redirect the user or clear the form here
-    }
-       
-    }//end if(strpos($key, 'chk_bill_id_')>=0)
-  }//end foreach
-   	
-  $conn==null;    
-
-}//end if ($_SERVER["REQUEST_METHOD"] == "POST")
-
-
   
-?>
+
   <div class="container">
   <?php 
    $activemenu = "reviews"; 
@@ -391,35 +341,33 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
         <!-- Recent Orders Table -->
         <div class="recent-orders">
-        <h2>Filter Orders</h2>
+        <h2>Filter Reviews</h2>
 
         <!-- Filter Dropdown -->
         <table><thead><tr><th><label for="filterOptions" style="font-size: 15px;">Choose Filter: </label>
         <select id="filterOptions" style="font-size: 15px; border: none; background: none; outline: none; color: var(--color-dark-variant);">
-            <option value="recent" selected>Recent Orders</option>
-            <option value="highest">Highest Price</option>
-            <option value="lowest">Lowest Price</option>
+            <option value="recent" selected>Recent Reviews</option>
+            <option value="good_rating">Good Rating</option>
+            <option value="bad_rating">Bad Rating</option>
         </select></table></thead></tr></th></br></br>
 
-          <h2>Recent Orders</h2>
+          <h2>Reviews</h2>
           <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
 
                <!-- Orders Table -->
     <table>
         <thead>
             <tr>
+                <th>Review ID</th>
+                <th>Comment</th>
+                <th>Rating</th>
                 <th>User Name</th>
+                <th>Bill Date</th>           
                 <th>Bill ID</th>
-                <th>Bill Date</th>
-                <th>Total Price</th>
-                <th>Status</th>
-                <th style="color: #F7D060">Active</th>
-                <th style="color: #1B9C85">Completed</th>
-                <th style="color: #FF0060">Cancel</th>
                 <th>Details</th>
             </tr>
         </thead>
-        <tbody id="recent-orders-table-body">
+        <tbody id="recent-reviews-table-body">
             <!-- This part will be populated dynamically via JavaScript -->
         </tbody>
     </table>
@@ -467,22 +415,16 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
           </div>
         </div>
       
-      <!-- Details pertaining to recent orders -->
-      <div class="user-details">
-      <h2>User Details</h2>
+      <!-- Details pertaining to recent reviews -->
+      <div class="bill-details">
+      <h2>Bill Details</h2>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>Food Name</th>
-                            <th>Food Quantity</th>
-                            <th>Food Price</th>
-                            <th></th>
-                        </tr>
+                        
                     </thead>
-                    <tbody id="bill-details"></tbody>
+                    <tbody id="review-bill-details"></tbody>
                 </table>        
-            </div>  
+            </div>   
       </div>
   </div>
   <!-- End of Right Section -->

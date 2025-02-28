@@ -31,33 +31,38 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
     <script>
         $(document).ready(function() {
-            // Function to fetch orders based on the selected filter
-            function fetchOrders(filter, page = 1) {
+            // Function to fetch reservations based on the selected filter
+            function fetchReservations(filter, page = 1) {
                 $.ajax({
-                    url: "fetch_orders.php",
+                    url: "fetch_filter_reservation.php",
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
                     success: function(response) {
-                      var tableBody = $("#recent-orders-table-body"); // Update the table body based on filter
+                      var tableBody = $("#recent-reservations-table-body"); // Update the table body based on filter
                         tableBody.empty(); // Clear existing rows
 
-                        const { orders, totalPages } = response;
+                        const { reservations, totalPages } = response;
 
-                        if (orders.length === 0) {
+                        if (reservations.length === 0) {
                     tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
                         } else {
-                            $.each(orders, function(index, bill) {
+                            $.each(reservations, function(index, reservation) {
                                 var row = `<tr>
-                                    <td>${bill.user_name}</td>
-                                    <td>${bill.bill_id}</td>
-                                    <td>${bill.bill_date}</td>
-                                    <td>${bill.total_price}</td>
-                                    <td style="color: ${getStatusColor(bill.status)}">${bill.status}</td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="active"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="completed"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="cancel"></td>
-                                    <td><a href="#" class="one details-link" data-bill-id="${bill.bill_id}">Details</a></td>                   
+                                    <td>${reservation.reservation_id}</td>
+                                    <td>${reservation.reservation_name}</td>
+                                    <td>${reservation.reservation_phone}</td>
+                                    <td>${reservation.reservation_people}</td>
+                                    <td>${reservation.reservation_tables}</td>
+                                    <td>${reservation.reservation_date}</td>
+                                    <td>${reservation.reservation_time}</td>
+                                    <td>${reservation.reservation_note}</td>
+                                    <td>${reservation.user_id}</td> 
+                                    <td style="color: ${getStatusColor(reservation.status)}">${reservation.status}</td>
+                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="active"></td>
+                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="completed"></td>
+                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="cancel"></td>
+                                    <td><a href="#" class="one details-link" data-user-id="${reservation.user_id}">Details</a></td>                   
                                 </tr>`;  
                                 tableBody.append(row);
                             });
@@ -120,31 +125,24 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         $(".page-link").click(function (event) {
             event.preventDefault();
             var page = $(this).data("page");
-            fetchOrders($("#filterOptions").val(), page);
+            fetchReservations($("#filterOptions").val(), page);
         });
     }
 
 
-            // Default filter: Recent Orders
-            fetchOrders("recent");
-            // Retrieve the saved filter or default to "recent"
+            fetchReservations("recent");
 
-//             Retrieve the Filter on Page Load
-// When the page loads, check if a filter is stored in localStorage and use it to fetch data:
             const selectedFilter = localStorage.getItem("selectedFilter") || "recent";
             $("#filterOptions").val(selectedFilter); // Set the dropdown to the saved filter
-            fetchOrders(selectedFilter); // Fetch orders with the selected filter
+            fetchReservations(selectedFilter); // Fetch orders with the selected filter
 
-            // Change event listener for filter selection
-//             Save the Selected Filter in localStorage
-// Update the filter dropdown change event to save the selected filter to localStorage:
             $("#filterOptions").change(function() {
                 var selectedFilter = $(this).val(); // Get selected filter option
                 localStorage.setItem("selectedFilter", selectedFilter); // Save to localStorage
-                fetchOrders(selectedFilter);
+                fetchReservations(selectedFilter);
             });
 
-            // Function to return color based on order status
+            // Function to return color based on reservation status
             function getStatusColor(status) {
                 if (status === "cancel") return "#FF0060";
                 if (status === "completed") return "#1B9C85";
@@ -156,17 +154,17 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
             $(document).on('click', '.details-link', function (event) {
                 event.preventDefault();
-                let billId = $(this).data('bill-id');
+                let userId = $(this).data('user-id');
 
                 $.ajax({
-                    url: 'fetch_bill_details.php',
+                    url: 'fetch_reservation_user_details.php',
                     type: 'GET',
-                    data: { bill_id: billId },
+                    data: { user_id: userId },
                     success: function (response) {
-                        $('#bill-details').html(response);
+                        $('#userr-details').html(response);
                     },
                     error: function () {
-                        alert('Error fetching bill details.');
+                        alert('Error fetching user details.');
                     }
                 });
             });
@@ -285,12 +283,12 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
   require_once "includes/db_connect.php";
   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $bill_id = "";
+  $reservation_id = "";
   $status="";
   foreach($_POST as $key => $value) {
-    if (strpos($key, 'rdo_bill_id_')>=0) {
-       $bill_id = substr($key, 12);
-       #echo $bill_id;
+    if (strpos($key, 'rdo_reservation_id_')>=0) {
+       $reservation_id = substr($key, 19);
+       #echo $reservation_id;
        #echo $value;
        
        if($value == "cancel")
@@ -306,7 +304,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
        	$status = "active";
        }
        $Msg = "";
-       $updateResult = update_status_bill($conn, $status, $bill_id);
+       $updateResult = update_status_reservation($conn, $status, $reservation_id);
 
     if (!$updateResult) {
         $Msg = "ERROR: Record could not be saved!";
@@ -317,7 +315,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         // Optionally, redirect the user or clear the form here
     }
        
-    }//end if(strpos($key, 'chk_bill_id_')>=0)
+    }//end if(strpos($key, 'chk_reservation_id_')>=0)
   }//end foreach
    	
   $conn==null;    
@@ -391,17 +389,17 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
         <!-- Recent Orders Table -->
         <div class="recent-orders">
-        <h2>Filter Orders</h2>
+        <h2>Filter Reservation</h2>
 
         <!-- Filter Dropdown -->
         <table><thead><tr><th><label for="filterOptions" style="font-size: 15px;">Choose Filter: </label>
         <select id="filterOptions" style="font-size: 15px; border: none; background: none; outline: none; color: var(--color-dark-variant);">
-            <option value="recent" selected>Recent Orders</option>
-            <option value="highest">Highest Price</option>
-            <option value="lowest">Lowest Price</option>
+            <option value="recent" selected>Recent Reservations</option>
+            <option value="descending">Reservation Name: Descending</option>
+            <option value="ascending">Reservation Name: Ascending</option>
         </select></table></thead></tr></th></br></br>
 
-          <h2>Reviews</h2>
+          <h2>Reservations</h2>
           <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
 
                <!-- Orders Table -->
@@ -416,6 +414,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                 <th>Date</th>
                 <th>Time</th>
                 <th>Note</th>
+                <th>User ID</th>
                 <th>Status</th>
                 <th style="color: #F7D060">Active</th>
                 <th style="color: #1B9C85">Completed</th>
@@ -423,7 +422,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                 <th>Details</th>
             </tr>
         </thead>
-        <tbody id="recent-orders-table-body">
+        <tbody id="recent-reservations-table-body">
             <!-- This part will be populated dynamically via JavaScript -->
         </tbody>
     </table>
@@ -475,16 +474,10 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
       <div class="user-details">
       <h2>User Details</h2>
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>Food Name</th>
-                            <th>Food Quantity</th>
-                            <th>Food Price</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="bill-details"></tbody>
+                    <!-- <thead>
+                        
+                    </thead> -->
+                    <tbody id="userr-details"></tbody>
                 </table>        
             </div>  
       </div>

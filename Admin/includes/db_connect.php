@@ -285,6 +285,7 @@ function ban_user($conn, $ban, $user_id) {
     }
 }
 
+//function to fetch bill details in review page
 function review_bill_details($conn, $bill_id)
 {
    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -310,6 +311,64 @@ function review_bill_details($conn, $bill_id)
    // Return the result
    return $result;
 }   
+
+//for index.php
+//functions to update data in databasefunction update_status_reservation($conn, $status, $reservation_id) {
+    function update_status_reservation($conn, $status, $reservation_id) {
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+        try {
+            $conn->beginTransaction(); // Start transaction
+            
+            $sUpdate = "UPDATE reservation SET `status` = :statuss WHERE reservation_id = :reservation_id";
+            
+            $stmt = $conn->prepare($sUpdate);
+            $stmt->bindParam(":statuss", $status);
+            $stmt->bindParam(":reservation_id", $reservation_id);
+            
+            $stmt->execute();
+            
+            // Check if the row was inserted
+            if ($stmt->rowCount() > 0) {
+                $conn->commit(); // Commit transaction if successful
+                return true;
+            } else {
+                $conn->rollBack(); // Rollback if insertion failed
+                return false;
+            }
+        } catch (Exception $e) {
+            $conn->rollBack(); // Rollback in case of an error
+            return false;
+        }
+    }
+
+    //functions to retrieve the user details of the reservation
+function reservation_user_details($conn, $user_id)
+{
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sQuery = "SELECT 
+                    u.user_id, 
+                    u.user_name, 
+                    u.user_email, 
+                    u.firstname, 
+                    u.lastname, 
+                    u.phone
+               FROM user u
+               WHERE u.user_id = :user_id"; 
+
+   $stmt = $conn->prepare($sQuery);
+
+   $stmt->bindParam(":user_id", $user_id );
+
+    // Execute the query
+   $stmt->execute();
+   
+   $result = $stmt->fetch(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+
+   // Return the result
+   return $result;
+}  
 
 
 

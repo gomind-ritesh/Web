@@ -464,14 +464,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
       <h2>Bill Details-(5 Recent Max)</h2>
                 <table>
                     <thead>
-                        <tr>
-                            <th>User Name</th>
-                            <th>Bill ID</th>
-                            <th>Bill Date</th>
-                            <th>Status</th>
-                            <th>Total Price</th>
-                            <th></th>
-                        </tr>
+                        
                     </thead>
                     <tbody id="user-bill-details"></tbody>
                 </table>        

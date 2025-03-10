@@ -45,7 +45,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                         const { reservations, totalPages } = response;
 
                         if (reservations.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
+                    tableBody.append("<tr><td colspan='8'>No reservations found.</td></tr>");
                         } else {
                             $.each(reservations, function(index, reservation) {
                                 var row = `<tr>
@@ -226,7 +226,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         max-height: 45%;   
     }
 
-    .right-section .user-details table tbody td{
+    /* .right-section .user-details table tbody td{
         height: 2.8rem;
         border-bottom: 1px solid var(--color-light);
         color: var(--color-dark-variant);
@@ -234,7 +234,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
      .right-section .user-details table tbody tr:last-child td{
         border: none;
-    }
+    } */
 
     #pagination {
     display: flex; /* Use flexbox for horizontal alignment */
@@ -306,14 +306,14 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
        $Msg = "";
        $updateResult = update_status_reservation($conn, $status, $reservation_id);
 
-    if (!$updateResult) {
-        $Msg = "ERROR: Record could not be saved!";
-        echo "<h3 class='error'>$Msg</h3>";
-    } else {
-        $Msg = "Record saved successfully!";
-        echo "<h3>$Msg</h3>";
-        // Optionally, redirect the user or clear the form here
-    }
+    // if (!$updateResult) {
+    //     $Msg = "ERROR: Record could not be saved!";
+    //     echo "<h3 class='error'>$Msg</h3>";
+    // } else {
+    //     $Msg = "Record saved successfully!";
+    //     echo "<h3>$Msg</h3>";
+    //     // Optionally, redirect the user or clear the form here
+    // }
        
     }//end if(strpos($key, 'chk_reservation_id_')>=0)
   }//end foreach
@@ -387,7 +387,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </div>
         <!-- End of Analyses -->
 
-        <!-- Recent Orders Table -->
+        <!-- Recent Reservation Table -->
         <div class="recent-orders">
         <h2>Filter Reservation</h2>
 
@@ -473,12 +473,10 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
       <!-- Details pertaining to recent orders -->
       <div class="user-details">
       <h2>User Details</h2>
-                <table>
-                    <!-- <thead>
-                        
-                    </thead> -->
-                    <tbody id="userr-details"></tbody>
-                </table>        
+      <div id="userr-details">
+
+          </div>
+                    
             </div>  
       </div>
   </div>

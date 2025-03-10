@@ -370,6 +370,95 @@ function reservation_user_details($conn, $user_id)
    return $result;
 }  
 
+    //functions to retrieve the food details 
+    function food_image($conn, $food_id)
+    {
+       $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+        $sQuery = "SELECT 
+                        f.food_id, 
+                        f.food_name, 
+                        f.food_source
+                   FROM food f
+                   WHERE f.food_id = :food_id"; 
+    
+       $stmt = $conn->prepare($sQuery);
+    
+       $stmt->bindParam(":food_id", $food_id );
+    
+        // Execute the query
+       $stmt->execute();
+       
+       $result = $stmt->fetch(PDO::FETCH_ASSOC); // Fetches the row as an associative array
+    
+       // Return the result
+       return $result;
+    }  
+
+    //functions to enter new food details
+    function enter_food($conn, $name, $price, $discount, $description, $category, $type, $source)
+    {
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+        try {
+            $conn->beginTransaction(); // Start transaction
+    
+            $sInsert = "INSERT INTO food (food_name, food_price, food_discount, food_description, food_category, food_type, food_source) 
+                        VALUES (:namee, :price, :discount, :descriptionn, :category, :typee, :source)";
+            
+            $stmt = $conn->prepare($sInsert);
+            $stmt->bindParam(":namee", $name);
+            $stmt->bindParam(":price", $price);
+            $stmt->bindParam(":discount", $discount);
+            $stmt->bindParam(":descriptionn", $description);
+            $stmt->bindParam(":category", $category);
+            $stmt->bindParam(":typee", $type);
+            $stmt->bindParam(":source", $source);
+            
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+            $conn->commit(); // Commit transaction if successful
+            return true;
+            }
+            else {
+                $conn->rollBack(); // Rollback if insertion failed
+                return false;
+            }
+        } catch (Exception $e) {
+            $conn->rollBack(); // Rollback in case of an error
+            return false;
+        }
+    }
+//functions to update food availability
+    function update_food_availability($conn, $food_id) {
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        try {
+            $conn->beginTransaction();
+            
+            $updateQuery = "UPDATE food SET available = 0 WHERE food_id = :food_id";
+            
+            $stmt = $conn->prepare($updateQuery);
+            
+            $stmt->bindParam(":food_id", $food_id, PDO::PARAM_INT);
+            
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+                
+                $conn->commit();
+                return true; 
+            } else {
+                $conn->rollBack();
+                return false; 
+            }
+        } catch (Exception $e) {
+            $conn->rollBack();
+            return false; 
+        }
+    }
+    
 
 
 ?>

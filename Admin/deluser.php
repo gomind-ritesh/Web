@@ -142,7 +142,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                 fetchUsers(selectedFilter);
             });
 
-            // Function to return color based on order status
+            // Function to return color based on user status
             function getStatusColor(ban) {
                 if (ban === "Ban") return "#FF0060";
                 if (ban === "Not Ban") return "#1B9C85";
@@ -380,7 +380,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </div>
         <!-- End of Analyses -->
 
-        <!-- Recent Orders Table -->
+        <!-- Recent Users Table -->
         <div class="recent-orders">
         <h2>Filter Users</h2>
 

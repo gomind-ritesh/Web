@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
 if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
@@ -31,33 +35,36 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
     <script>
         $(document).ready(function() {
-            // Function to fetch orders based on the selected filter
-            function fetchOrders(filter, page = 1) {
+            // Function to fetch food details based on the selected filter
+            function fetchFood(filter, page = 1) {
                 $.ajax({
-                    url: "fetch_orders.php",
+                    url: "fetch_filter_food.php",
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
                     success: function(response) {
-                      var tableBody = $("#recent-orders-table-body"); // Update the table body based on filter
+                      var tableBody = $("#recent-food-table-body"); // Update the table body based on filter
                         tableBody.empty(); // Clear existing rows
 
-                        const { orders, totalPages } = response;
+                        const { foodItems, totalPages } = response;
 
-                        if (orders.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
+                        if (foodItems.length === 0) {
+                    tableBody.append("<tr><td colspan='8'>No food found.</td></tr>");
                         } else {
-                            $.each(orders, function(index, bill) {
+                            $.each(foodItems, function(index, food) {
+                              let available_string = food.available === 1 ? "Yes" : "No"; // Simplified conditional logic
                                 var row = `<tr>
-                                    <td>${bill.user_name}</td>
-                                    <td>${bill.bill_id}</td>
-                                    <td>${bill.bill_date}</td>
-                                    <td>${bill.total_price}</td>
-                                    <td style="color: ${getStatusColor(bill.status)}">${bill.status}</td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="active"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="completed"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="cancel"></td>
-                                    <td><a href="#" class="one details-link" data-bill-id="${bill.bill_id}">Details</a></td>                   
+                                    <td>${food.food_id}</td>
+                                    <td>${food.food_name}</td>
+                                    <td>${food.food_price}</td>
+                                    <td>${food.food_discount}</td>
+                                    <td>${food.food_description}</td>
+                                    <td>${food.food_category}</td>
+                                    <td>${food.food_type}</td>
+                                    <td><a href="#" class="one details-link" data-food-id="${food.food_id}">${food.food_source}</a></td> 
+                                    <td style="color: ${getStatusColor(available_string)}">${available_string}</td>        
+                                    <td><a href="#" class="two delete-link" data-delete-id="${food.food_id}">Delete</a></td>  
+                                    <td><a href="#" class="three edit-link" data-edit-id="${food.food_id}">Edit</a></td>     
                                 </tr>`;  
                                 tableBody.append(row);
                             });
@@ -120,20 +127,20 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         $(".page-link").click(function (event) {
             event.preventDefault();
             var page = $(this).data("page");
-            fetchOrders($("#filterOptions").val(), page);
+            fetchFood($("#filterOptions").val(), page);
         });
     }
 
 
-            // Default filter: Recent Orders
-            fetchOrders("recent");
+            // Default filter: Recent food
+            fetchFood("recent");
             // Retrieve the saved filter or default to "recent"
 
 //             Retrieve the Filter on Page Load
 // When the page loads, check if a filter is stored in localStorage and use it to fetch data:
             const selectedFilter = localStorage.getItem("selectedFilter") || "recent";
             $("#filterOptions").val(selectedFilter); // Set the dropdown to the saved filter
-            fetchOrders(selectedFilter); // Fetch orders with the selected filter
+            fetchFood(selectedFilter); // Fetch orders with the selected filter
 
             // Change event listener for filter selection
 //             Save the Selected Filter in localStorage
@@ -141,14 +148,13 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
             $("#filterOptions").change(function() {
                 var selectedFilter = $(this).val(); // Get selected filter option
                 localStorage.setItem("selectedFilter", selectedFilter); // Save to localStorage
-                fetchOrders(selectedFilter);
+                fetchFood(selectedFilter);
             });
 
-            // Function to return color based on order status
-            function getStatusColor(status) {
-                if (status === "cancel") return "#FF0060";
-                if (status === "completed") return "#1B9C85";
-                if (status === "active") return "#F7D060";
+            // Function to return color based on food available
+            function getStatusColor(available) {
+                if (available === "No") return "#FF0060";
+                if (available === "Yes") return "#1B9C85";
                 return "black";
             }
         });
@@ -156,20 +162,86 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
             $(document).on('click', '.details-link', function (event) {
                 event.preventDefault();
-                let billId = $(this).data('bill-id');
+                let foodId = $(this).data('food-id');
 
                 $.ajax({
-                    url: 'fetch_bill_details.php',
+                    url: 'fetch_food_image.php',
                     type: 'GET',
-                    data: { bill_id: billId },
+                    data: { food_id: foodId },
                     success: function (response) {
-                        $('#bill-details').html(response);
+                        $('#food-details').html(response);
                     },
                     error: function () {
-                        alert('Error fetching bill details.');
+                        alert('Error fetching food image.');
                     }
                 });
             });
+
+            $(document).on("click", ".delete-link", function (event) {
+    event.preventDefault();
+
+    // Get the food ID from the delete button's data attribute
+    let foodId = $(this).data("delete-id");
+
+    // Ask for confirmation before deleting
+    if (confirm("Are you sure you want to delete this food item?")) {
+
+        $.ajax({
+            url: "delete_food.php",
+            type: "POST",
+            data: { food_id: foodId },
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+
+                    //   // Dynamically remove the row from the table
+                    //   $("#recent-food-table-body").find(`tr td:contains(${foodId})`).closest("tr").remove();
+                    // // Refresh the food list after successful deletion
+                    // let selectedFilter = $("#filterOptions").val();  // Retrieve the selected value
+                    // console.log("Selected Filter:", selectedFilter);
+                    // fetchFood(selectedFilter);  // Fetch data based on the selected filter
+                } else {
+                    alert(response.message); // Show the error message
+                }
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                alert("An error occurred while attempting to delete the food item.");
+            }
+        });
+    }
+});
+
+$(document).on("click", ".edit-link", function (event) {
+    event.preventDefault();
+
+    // Get the food ID from the edit button's data attribute
+    let foodId = $(this).data("edit-id");
+
+    $.ajax({
+        url: "check_edit_food.php", // PHP script to handle the check
+        type: "POST",
+        data: { food_id: foodId },
+        dataType: "json",
+        success: function (response) {
+          if (response.related === true) {
+        window.location.href = `add_edit_food_form.php?food_id=${foodId}`;
+    } else if (response.related === false) {
+        window.location.href = `edit_food_form.php?food_id=${foodId}`;
+    } else {
+        alert("Unexpected response format. Please check the server response.");
+    }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", status, error);
+        }
+    });
+});
+
+
+
     
     </script>
 
@@ -177,7 +249,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
   .error{
     color: red;
   }
-  input[type=submit], input[type=reset] {
+  input[type=submit], input[type=reset], input[type=button] {
     background: #0066A2;
     color: white;
     border-style: outset;
@@ -188,7 +260,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     font: arial,sans-serif;
     text-shadow: none;
     }
-    input[type=submit]:hover, input[type=reset]:hover {
+    input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover {
       background: #016ABC;
       color: #fff;
       border: 1px solid #eee;
@@ -204,7 +276,23 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     a.one:hover {color:blue;
         text-decoration: none;}
 
-    .right-section .user-details{
+        /* for delete "details" */
+    a.two:link {color:#FF0060;
+    text-decoration: none;}
+    a.two:visited {color:#FF0060;
+        text-decoration: none;}
+    a.two:hover {color:#96033b;
+        text-decoration: none;}
+
+        /* for edit "details" */
+    a.three:link {color:#F7D060;
+    text-decoration: none;}
+    a.three:visited {color:#F7D060;
+        text-decoration: none;}
+    a.three:hover {color:#ab8b2e;
+        text-decoration: none;}
+
+    .right-section .food-image{
     background-color: var(--color-white);
     width: 100%;
     padding: var(--card-padding);
@@ -215,28 +303,28 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     margin-top: 4rem;
     }
 
-    .right-section .user-details:hover{
+    .right-section .food-image:hover{
         box-shadow: none;
     }
 
-    .right-section .user-details h2{
+    .right-section .food-image h2{
         margin-bottom: 0.8rem;
     }
 
-    .right-section .user-details{
+    .right-section .food-image{
         overflow-y: scroll; 
         max-height: 45%;   
     }
 
-    .right-section .user-details table tbody td{
+    /* .right-section .food-image table tbody td{
         height: 2.8rem;
         border-bottom: 1px solid var(--color-light);
         color: var(--color-dark-variant);
     }
 
-     .right-section .user-details table tbody tr:last-child td{
+     .right-section .food-image table tbody tr:last-child td{
         border: none;
-    }
+    } */
 
     #pagination {
     display: flex; /* Use flexbox for horizontal alignment */
@@ -280,53 +368,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
   <body>
 
-  <?php  
-// define variables and set to empty string values
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  require_once "includes/db_connect.php";
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $bill_id = "";
-  $status="";
-  foreach($_POST as $key => $value) {
-    if (strpos($key, 'rdo_bill_id_')>=0) {
-       $bill_id = substr($key, 12);
-       #echo $bill_id;
-       #echo $value;
-       
-       if($value == "cancel")
-       {
-       	$status = "cancel";
-       }
-       if($value == "completed")
-       {
-       	$status = "completed";
-       }
-       if($value == "active")
-       {
-       	$status = "active";
-       }
-       $Msg = "";
-       $updateResult = update_status_bill($conn, $status, $bill_id);
 
-    if (!$updateResult) {
-        $Msg = "ERROR: Record could not be saved!";
-        echo "<h3 class='error'>$Msg</h3>";
-    } else {
-        $Msg = "Record saved successfully!";
-        echo "<h3>$Msg</h3>";
-        // Optionally, redirect the user or clear the form here
-    }
-       
-    }//end if(strpos($key, 'chk_bill_id_')>=0)
-  }//end foreach
-   	
-  $conn==null;    
-
-}//end if ($_SERVER["REQUEST_METHOD"] == "POST")
-
-
-  
-?>
   <div class="container">
   <?php 
    $activemenu = "foodmenu"; 
@@ -389,37 +431,42 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </div>
         <!-- End of Analyses -->
 
-        <!-- Recent Orders Table -->
+        <!-- Recent Food Table -->
         <div class="recent-orders">
-        <h2>Filter Orders</h2>
+        <h2>Filter Food</h2>
 
         <!-- Filter Dropdown -->
         <table><thead><tr><th><label for="filterOptions" style="font-size: 15px;">Choose Filter: </label>
         <select id="filterOptions" style="font-size: 15px; border: none; background: none; outline: none; color: var(--color-dark-variant);">
-            <option value="recent" selected>Recent Orders</option>
-            <option value="highest">Highest Price</option>
-            <option value="lowest">Lowest Price</option>
+            <option value="recent" selected>Recent Food Creation</option>
+            <option value="appetizer-nonveg">Appetizer, Non-Veg</option>
+            <option value="appetizer-veg">Appetizer, Veg</option>
+            <option value="maincourse-veg">Main Course, Veg</option>
+            <option value="maincourse-nonveg">main Course, Non-veg</option>
+            <option value="dessert">Dessert, Veg</option>
         </select></table></thead></tr></th></br></br>
 
-          <h2>Reviews</h2>
+          <h2>Food</h2>
           <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>"  >
 
                <!-- Orders Table -->
     <table>
         <thead>
             <tr>
-                <th>Review ID</th>
-                <th>Comment</th>
-                <th>Rating</th>
-                <th>Total Price</th>
-                <th>Status</th>
-                <th style="color: #F7D060">Active</th>
-                <th style="color: #1B9C85">Completed</th>
-                <th style="color: #FF0060">Cancel</th>
-                <th>Details</th>
+                <th>Food ID</th>
+                <th>Name</th>
+                <th style='padding: 12px; width: 5%;'>Price </th>
+                <th>Discount</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Available</th>
+                <th style='padding: 12px; width: 5%;'>Delete</th>
+                <th style='padding: 12px; width: 5%;'>Edit</th>
             </tr>
         </thead>
-        <tbody id="recent-orders-table-body">
+        <tbody id="recent-food-table-body">
             <!-- This part will be populated dynamically via JavaScript -->
         </tbody>
     </table>
@@ -427,11 +474,14 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
           
        
 
-            <input type="reset" value="Reset">
-            <input type="submit" value="Submit">
+            <!-- <input type="reset" value="Reset">
+            <input type="submit" value="Submit"> -->
         </form>
         </div>
         <div id="pagination"></div>
+        <a href="add_food_form.php">
+    <input type="button" value="Add">
+   </a>
         <!-- End of Recent Orders -->
       </main>
       <!-- End of Main Content -->
@@ -468,20 +518,12 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </div>
       
       <!-- Details pertaining to recent orders -->
-      <div class="user-details">
-      <h2>User Details</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Bill ID</th>
-                            <th>Food Name</th>
-                            <th>Food Quantity</th>
-                            <th>Food Price</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="bill-details"></tbody>
-                </table>        
+      <div class="food-image">
+      <h2>Food Image</h2>
+      <div id="food-details">
+
+          </div>
+                       
             </div>  
       </div>
   </div>

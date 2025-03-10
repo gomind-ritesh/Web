@@ -43,18 +43,32 @@ else
 
     // define variables and set to empty string values
 
-    $successmsg = $partysize = $date = $time = $phone = $comment = $Msg ="";
-    $partysizeErr = $dateErr = $timeErr = $phoneErr = $commentErr ="";
+    $successmsg = $reservationname = $partysize = $date = $time = $phone = $comment = $Msg ="";
+    $reservationnameErr = $partysizeErr = $dateErr = $timeErr = $phoneErr = $commentErr ="";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
+
+         // reservation name
+    if (empty($_POST["reservation_name"])) {//check if the field is empty
+        $reservationnameErr = "Select a reservation name";
+      } 
+      else
+      {
+        $reservationname = test_input($_POST["reservation_name"]);//call the test_input function on $_POST["txt_name"]
+        
+        if (!preg_match("/^[a-zA-Z ]+$/",$reservationname)) 
+        { //Use a regular expression to validate the name field
+            $reservationnameErr = "Only letters and white space allowed";
+        }
+      }//end else
 
         //party-size
         if (empty($_POST["party-size"])) {
             $partysizeErr= "Select a party size";
         } else {
             $partysize = test_input($_POST["party-size"]);
-            //Let us validate the clean_rating
+            //Let us validate the party size
             if (!filter_var($partysize, FILTER_VALIDATE_INT)) { //Let us invoke the inbuilt function filter_var
             $partysizeErr = "party size should be numeric";
             }//end if
@@ -96,7 +110,7 @@ else
                 
         }//end else
         
-        //commnet
+        //comment
         if (empty($_POST["txt_comment"])) {
             $commentErr = ""; //assume comment is optional
         } else {
@@ -108,13 +122,13 @@ else
         }
 
     
-        if($partysizeErr == "" && $dateErr == "" &&  $timeErr == "" && $phoneErr == "" && $commentErr =="")
+        if($reservationnameErr == "" && $partysizeErr == "" && $dateErr == "" &&  $timeErr == "" && $phoneErr == "" && $commentErr =="")
         {
             
             
             require_once "includes/db_connect.php";
             
-            $results = enter_reservation($conn,$partysize, $date, $time, $phone, $comment);
+            $results = enter_reservation($conn, $reservationname, $partysize, $date, $time, $phone, $comment);
 
             if (!$results) {
                 $Msg = "ERROR: Record could not be saved!";
@@ -131,7 +145,7 @@ else
     ?>
 
     <?php
-    if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $partysizeErr == "" && $dateErr == "" &&  $timeErr == "" && $phoneErr == "" && $commentErr ==""))
+    if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $reservationnameErr == "" && $partysizeErr == "" && $dateErr == "" &&  $timeErr == "" && $phoneErr == "" && $commentErr ==""))
     {
     ?>
 
@@ -150,6 +164,12 @@ else
             </p>
 
             <form  method="post" action="<?php echo $_SERVER["PHP_SELF"];?>" >
+
+            <label for="reservation_name">  Reservation Name</label>
+
+            <input type="text" id="reservation_name" class="reservation_name" name="reservation_name" placeholder="Reservation Name" title="Rservation name should consist of only characters"
+            pattern="[A-Z][a-z]+( [A-Z][a-z]'+)*$" value = "<?php echo ($reservationnameErr==""?$reservationname:'')?>" required />
+	        <span class="error"> <?php echo $reservationnameErr;?></span><br/><br/>
 
             <label for="party-size">Party size</label>
 

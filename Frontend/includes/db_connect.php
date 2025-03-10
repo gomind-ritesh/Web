@@ -119,7 +119,7 @@ function retrieve_userid($conn)
 
 }
 
-function enter_reservation($conn, $partysize, $date, $time, $phone, $comment)
+function enter_reservation($conn, $reservationname, $partysize, $date, $time, $phone, $comment)
 {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -134,13 +134,12 @@ function enter_reservation($conn, $partysize, $date, $time, $phone, $comment)
         $numtables = ceil($partysize / 3); // Use ceil to calculate number of tables
         
         $rtime = date("H:i:s", strtotime(sprintf("%02d:00:00", $time)));
-        $name = $_SESSION["username"];
 
         $sInsert = "INSERT INTO reservation (reservation_name, reservation_phone, reservation_people, reservation_tables, reservation_date, reservation_time, reservation_note, user_id) 
                     VALUES (:reservation_name, :reservation_phone, :reservation_people, :reservation_table, :reservation_date, :reservation_time, :reservation_note, :user_id)";
         
         $stmt = $conn->prepare($sInsert);
-        $stmt->bindParam(":reservation_name", $name);
+        $stmt->bindParam(":reservation_name", $reservationname);
         $stmt->bindParam(":reservation_phone", $phone);
         $stmt->bindParam(":reservation_people", $partysize);
         $stmt->bindParam(":reservation_table", $numtables);

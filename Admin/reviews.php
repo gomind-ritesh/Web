@@ -45,7 +45,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                         const { reviews, totalPages } = response;
 
                         if (reviews.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
+                    tableBody.append("<tr><td colspan='8'>No reviews found.</td></tr>");
                         } else {
                             $.each(reviews, function(index, review) {
                                 var row = `<tr>
@@ -336,7 +336,7 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </div>
         <!-- End of Analyses -->
 
-        <!-- Recent Orders Table -->
+        <!-- Recent Reviews Table -->
         <div class="recent-orders">
         <h2>Filter Reviews</h2>
 
@@ -372,8 +372,8 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
           
        
 
-            <input type="reset" value="Reset">
-            <input type="submit" value="Submit">
+            <!-- <input type="reset" value="Reset">
+            <input type="submit" value="Submit"> -->
         </form>
         </div>
         <div id="pagination"></div>

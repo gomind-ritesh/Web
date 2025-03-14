@@ -27,6 +27,41 @@ session_start();
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp"
       rel="stylesheet"
     />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+  $(document).ready(function(){
+     // When the user types in the username field, send an AJAX request to check if it's available.
+     //This ensures that the script runs only after the document (webpage) has fully loaded.
+     //It prevents errors caused by trying to interact with elements before they exist.
+    //->> replaced  $("#txt_username").keyup(function(){
+      $("#txt_username").keyup(function(){
+      //This event fires every time the user releases a key inside the #txt_username input field.
+      //Meaning, whenever the user types, it triggers the function.
+       var username = $(this).val();
+       //$(this) refers to the input field (#txt_username).
+       //.val() gets the current value that the user has typed.
+       if(username.length > 0) {
+        //Ensures that an AJAX request is only sent if the user has typed something.
+        //This prevents unnecessary requests when the field is empty.
+         $.ajax({
+           url: "includes/check_username.php", // The PHP file that will process the request
+           type: "GET", // Using GET method to send data
+           data: { username: username }, // Sending the username input
+           success: function(response) { // When the request is successful
+             // Update the span with the returned hint message.
+             $("#usernameHint").html(response); // Update the span with the response
+           }
+         });
+       } else {
+         $("#usernameHint").html("");
+         //If the input field is empty, it clears the #usernameHint message.
+         //This avoids showing old messages when the user deletes everything.
+       }
+     });
+   });
+  </script>
+
  </head>
 
  <?php
@@ -161,8 +196,10 @@ if(!( $_SERVER["REQUEST_METHOD"] == "POST" &&  $usernameErr == "" && $passwordEr
         pattern = "^.*@.*$" value = "<?php echo ($emailErr==""?$email:'')?>" required />
 	      <span class="error"> <?php echo $emailErr;?></span><br/>
 
-        <input class= "input" type="text" name="txt_username" placeholder="Username" title="Name should consist of one or more words, starting with an uppercase letter 
+        <input class= "input" type="text" name="txt_username" id="txt_username" placeholder="Username" title="Name should consist of one or more words, starting with an uppercase letter 
         followed by lowercase characters, and separated by spaces" pattern="[A-Z][a-z]+( [A-Z][a-z]+)*$" value = "<?php echo ($usernameErr==""?$username:'')?>" required />
+        <!-- This span will contain the AJAX hint -->
+        <span id="usernameHint"></span>
 	      <span class="error"> <?php echo $usernameErr;?></span><br/>
 	
 	      <input class= "input" type="password" name="txt_password" placeholder="Password" title="Password must contain one digit from 1 to 9, one lowercase letter, one 

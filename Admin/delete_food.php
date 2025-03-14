@@ -23,25 +23,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($result['count'] > 0) {
-                // Food item exists in bill_food_details, cannot delete
-                echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Cannot delete this food item. It is associated with existing bills which are used for analytics.'
-                ]);
+                // Food item exists in bill_food_details, set availability to 0
+                $updateQuery = "UPDATE food SET available = 0 WHERE food_id = ?";
+                $stmt = $conn->prepare($updateQuery);
+                $stmt->execute([$food_id]);
+
+                if ($stmt->rowCount() > 0) {
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => 'Food item availability set to 0 successfully due to association with bills.'
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Failed to update availability. Please try again.'
+                    ]);
+                }
             } else {
-                // Delete the food from the food table
+                // Food item is not associated with bill_food_details, proceed with deletion
                 $deleteQuery = "DELETE FROM food WHERE food_id = ?";
                 $stmt = $conn->prepare($deleteQuery);
                 $stmt->execute([$food_id]);
 
                 if ($stmt->rowCount() > 0) {
-                    // Successfully deleted
                     echo json_encode([
                         'status' => 'success',
                         'message' => 'Food item successfully deleted.'
                     ]);
                 } else {
-                    // Food item not found in the food table
                     echo json_encode([
                         'status' => 'error',
                         'message' => 'Food item not found or already deleted.'

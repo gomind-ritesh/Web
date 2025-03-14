@@ -2,6 +2,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 session_start();
 
 if (!isset($_SESSION['username']) || !isset($_SESSION['admin'])) {
@@ -39,13 +40,13 @@ if ($food_id > 0) {
 
 
 // Initialize variables with fetched data
-$name = $food['food_name'];
-$price = $food['food_price'];
-$discount = $food['food_discount'];
-$description = $food['food_description'];
-$category = $food['food_category'];
-$type = $food['food_type'];
-$source = $food['food_source'];
+$default_name = $food['food_name'];
+$default_price = $food['food_price'];
+$default_discount = $food['food_discount'];
+$default_description = $food['food_description'];
+$default_category = $food['food_category'];
+$default_type = $food['food_type'];
+$default_source = $food['food_source'];
 
 // define variables and set to empty string values
 function test_input($data) {
@@ -134,9 +135,9 @@ function test_input($data) {
       {
         $type = test_input($_POST["type"]);//call the test_input function on $_POST["txt_name"]
         
-        if (!preg_match("/^[a-zA-Z ]+$/",$type)) 
+        if (!preg_match("/^[a-zA-Z -]+$/",$type)) 
         { //Use a regular expression to validate the name field
-            $typeErr = "Only letters and white space allowed";
+            $typeErr = "Only letters and white space allowed(also including '-')";
         }
       }//end else
     
@@ -173,7 +174,7 @@ function test_input($data) {
             
             require_once "includes/db_connect.php";
             $target_final = "images/" . ($_FILES["file-select"]["name"]);  // Store relative path to the image
-            $results = enter_food($conn, $name, $price, $discount, $description, $category, $type, $target_final);
+            $results = edit_food($conn, $food_id, $name, $price, $discount, $description, $category, $type, $target_final);
     
             if (!$results) {
                 $Msg = "ERROR: Record could not be saved!";
@@ -218,38 +219,49 @@ function test_input($data) {
 </head>
 <body>
 <?php
-if(!( $_SERVER["REQUEST_METHOD"] == "GET" && $nameErr == "" && $priceErr == "" && $discountErr == "" &&  $descriptionErr == "" && $categoryErr == "" && $typeErr =="" && $sourceErr ==""))
+if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $nameErr == "" && $priceErr == "" && $discountErr == "" &&  $descriptionErr == "" && $categoryErr == "" && $typeErr =="" && $sourceErr ==""))
 {
 ?>
     <div class="food-container">
         <div class="food-form">
             <form method="post" action="<?php echo $_SERVER["PHP_SELF"] . "?food_id=" . $food_id; ?>" enctype="multipart/form-data">
-                <label for="name">Food Name</label>
-                <input type="text" id="name" class="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required />
-                <span class="error"> <?php echo $nameErr ?? ''; ?></span><br/><br/><br/>
+            <label for="name">Food Name</label>
 
-                <label for="price">Food Price</label>
-                <input type="number" class="price" name="price" step="0.01" min="0" value="<?php echo htmlspecialchars($price); ?>" required />
-                <span class="error"><?php echo $priceErr ?? ''; ?></span><br/>
+            <input type="text" id="name" class="name" name="name" 
+            pattern="[A-Za-z][a-zA-Z]*( [A-Za-z][a-zA-Z]*)*$" value="<?php echo htmlspecialchars($default_name); ?>" required />
+            <span class="error"> <?php echo $nameErr;?></span><br/><br/><br/>
 
-                <label for="discount">Food Discount</label>
-                <input type="number" class="discount" name="discount" step="0.01" min="0" value="<?php echo htmlspecialchars($discount); ?>" /><br/>
+            <label for="price">Food Price</label>
+            <input type="number" class="price" name="price" step="0.01" min="0" value="<?php echo htmlspecialchars($default_price); ?>" required /><br/>
+            <span class="error"><?php echo $priceErr; ?></span><br/>
 
-                <label for="description">Food Description</label>
-                <textarea name="description" id="description" rows="4" cols="50" required><?php echo htmlspecialchars($description); ?></textarea><br/>
+            <label for="discount">Food Discount</label>
+            <input type="number" class="discount" name="discount" step="0.01" min="0" value="<?php echo htmlspecialchars($default_discount); ?>" required /><br/>
+            <span class="error"><?php echo $discountErr; ?></span><br/>
 
-                <label for="category">Food Category</label>
-                <select name="category" id="category" required>
-                    <option value="appetizer" <?php if ($category == "appetizer") echo "selected"; ?>>Appetizer</option>
-                    <option value="maincourse" <?php if ($category == "maincourse") echo "selected"; ?>>Main Course</option>
-                    <option value="dessert" <?php if ($category == "dessert") echo "selected"; ?>>Dessert</option>
-                </select><br/>
+            <label for="description">Food Description</label>
+            <textarea rows="10" cols="10" name="description" class="description"><?php echo htmlspecialchars($default_description); ?></textarea>
+            <span class="error"> <?php echo $descriptionErr;?></span><br/><br/><br/>
 
-                <label for="type">Food Type</label>
-                <select name="type" id="type" required>
-                    <option value="veg" <?php if ($type == "veg") echo "selected"; ?>>Veg</option>
-                    <option value="nonveg" <?php if ($type == "nonveg") echo "selected"; ?>>Non-Veg</option>
-                </select><br/>
+            <!-- Food Category -->
+            <label for="category">Choose Food Category: </label>
+            <select id="category" name="category" class="styled-select">
+            <option value="" disabled>Select an option</option>
+            <option value="Appetizer" <?php echo $default_category == "Appetizer" ? "selected" : ""; ?>>Appetizer</option>
+            <option value="Main Course" <?php echo $default_category == "Main Course" ? "selected" : ""; ?>>Main Course</option>
+            <option value="Dessert" <?php echo $default_category == "Dessert" ? "selected" : ""; ?>>Dessert</option>
+            </select><br/><br/>
+
+            <!-- Food Type -->
+            <label for="type">Choose Food Type: </label><br/>
+            <div style="display: inline-block; margin-right: 20px;">
+                <input type="radio" id="veg" name="type" value="Veg" <?php echo $default_type == "Veg" ? "checked" : ""; ?>>
+                <label for="veg">Veg</label><br/>
+            </div>
+            <div style="display: inline-block;">
+                <input type="radio" id="nonveg" name="type" value="Non-Veg" <?php echo $default_type == "Non-Veg" ? "checked" : ""; ?>>
+                <label for="nonveg">Non Veg</label>
+            </div><br/><br/><br/>
 
                 <label for="file" class="form-label">Choose file</label>
                 <input
@@ -261,10 +273,8 @@ if(!( $_SERVER["REQUEST_METHOD"] == "GET" && $nameErr == "" && $priceErr == "" &
                     placeholder="Choose a File..." />
                 <div id="fileHelpId" class="form-text">Upload type: jpg, jpeg, png, gif</div><br><br>
 
-                <input type="submit" value="Update Food" />
+                <div style="padding-top: 20px"><button type="submit">ADD FOOD</button></div>
             </form>
-            <br>
-            <a href="food_menu.php" class="back-link">Back to Food Menu</a>
         </div>
     </div>
 </body>
@@ -286,6 +296,11 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" && $nameErr == "" && $priceErr == "" &&
     <a href="foodmenu.php">
     <span id="back" class="material-icons-sharp" style="color:#2C3A47"> arrow_back </span>
     <p class="back-link">Back Food Menu OR</p>
+</a>
+
+<a href="add_food_form.php">
+    <span id="initial" class="material-icons-sharp" style="color:#2C3A47"> add </span>
+    <p class="back-link">Add another Food</p>
 </a>
 
 </body>

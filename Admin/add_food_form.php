@@ -134,9 +134,9 @@ if (empty($_POST["type"])) {//check if the field is empty
   {
     $type = test_input($_POST["type"]);//call the test_input function on $_POST["txt_name"]
     
-    if (!preg_match("/^[a-zA-Z ]+$/",$type)) 
+    if (!preg_match("/^[a-zA-Z -]+$/",$type)) 
     { //Use a regular expression to validate the name field
-        $typeErr = "Only letters and white space allowed";
+        $typeErr = "Only letters and white space allowed(also including '-')";
     }
   }//end else
 
@@ -210,7 +210,7 @@ if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $nameErr == "" && $priceErr == "" 
             <label for="name">Food Name</label>
 
             <input type="text" id="name" class="name" name="name" 
-            pattern="[A-Z][a-z]+( [A-Z][a-z]'+)*$" value = "<?php echo ($nameErr==""?$name:'')?>" required />
+            pattern="[A-Za-z][a-zA-Z]*( [A-Za-z][a-zA-Z]*)*$" value = "<?php echo ($nameErr==""?$name:'')?>" required />
 	        <span class="error"> <?php echo $nameErr;?></span><br/><br/><br/>
 
             <label for="price">Food Price</label>
@@ -241,7 +241,7 @@ if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $nameErr == "" && $priceErr == "" 
             </div>
 
             <div style="display: inline-block;">
-            <input type="radio" id="nonveg" name="type" value="Non Veg">
+            <input type="radio" id="nonveg" name="type" value="Non-Veg">
             <label for="nonveg">Non Veg</label></div><br><br><br>
 
         <label for="file" class="form-label">Choose file</label>
@@ -268,7 +268,7 @@ if(!( $_SERVER["REQUEST_METHOD"] == "POST" && $nameErr == "" && $priceErr == "" 
         <h2><?php echo $successmsg?></h2>
 
 
-    <script src="index.js"></script>
+    <!-- <script src="index.js"></script> -->
 
 
   </body>

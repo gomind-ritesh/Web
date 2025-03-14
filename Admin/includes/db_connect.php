@@ -458,6 +458,41 @@ function reservation_user_details($conn, $user_id)
             return false; 
         }
     }
+
+    //functions to update data in database function edit_food($conn, $food_id, $name, $price, $discount, $description, $category, $type, $source) {
+        function edit_food($conn, $food_id, $name, $price, $discount, $description, $category, $type, $source) {
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+            try {
+                $conn->beginTransaction(); // Start transaction
+                
+                $sUpdate = "UPDATE food SET food_name = :namee, food_price = :price, food_discount = :discount, food_description = :descriptionn, food_category = :category, food_type = :typee, food_source = :source WHERE food_id = :food_id";
+                
+                $stmt = $conn->prepare($sUpdate);
+                $stmt->bindParam(":namee", $name);
+                $stmt->bindParam(":price", $price);
+                $stmt->bindParam(":discount", $discount);
+                $stmt->bindParam(":descriptionn", $description);
+                $stmt->bindParam(":category", $category);
+                $stmt->bindParam(":typee", $type);
+                $stmt->bindParam(":source", $source);
+                $stmt->bindParam(":food_id", $food_id);
+                
+                $stmt->execute();
+                
+                // Check if the row was inserted
+                if ($stmt->rowCount() > 0) {
+                    $conn->commit(); // Commit transaction if successful
+                    return true;
+                } else {
+                    $conn->rollBack(); // Rollback if insertion failed
+                    return false;
+                }
+            } catch (Exception $e) {
+                $conn->rollBack(); // Rollback in case of an error
+                return false;
+            }
+        }
     
 
 

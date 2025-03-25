@@ -30,52 +30,53 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Function to fetch users based on the selected filter
-            function fetchUsers(filter, page = 1) {
-                $.ajax({
-                    url: "fetch_filter_user.php",
-                    type: "GET",
-                    data: { filter: filter, page: page },
-                    dataType: "json",
-                    success: function(response) {
-                      var tableBody = $("#recent-users-table-body"); // Update the table body based on filter
-                        tableBody.empty(); // Clear existing rows
+       $(document).ready(function () {
+    // Function to fetch users based on the selected filter
+    function fetchUsers(filter, page = 1) {
+        $.ajax({
+            url: "fetch_filter_user.php",
+            type: "GET",
+            data: { filter: filter, page: page },
+            dataType: "json",
+        })
+            .done(function (data) {
+                var tableBody = $("#recent-users-table-body"); // Update the table body based on filter
+                tableBody.empty(); // Clear existing rows
 
-                        const { users, totalPages } = response;
+                const { users, totalPages } = data;
 
-                        if (users.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No users found.</td></tr>");
-                        } else {
-                            $.each(users, function(index, user) {
-                                let ban_string = user.ban === 1 ? "Ban" : "Not Ban"; // Simplified conditional logic
-                                var row = `<tr>
-                                    <td>${user.user_id}</td>
-                                    <td>${user.user_name}</td>
-                                    <td>${user.user_email}</td>
-                                    <td>${user.firstname}</td>
-                                    <td>${user.lastname}</td>
-                                    <td>${user.phone}</td>    
-                                    <td style="color: ${getStatusColor(ban_string)}">${ban_string}</td>
-                                    <td><input type="radio" name="rdo_user_id_${user.user_id}" value="ban"></td>    
-                                    <td><input type="radio" name="rdo_user_id_${user.user_id}" value="unban"></td>                 
-                                    <td><a href="#" class="one details-link" data-user-id="${user.user_id}">Details</a></td>                  
-                                </tr>`;  
-                                tableBody.append(row);
-                            });
-                        }
                         if (totalPages === 0) {
-                        $("#pagination").html(""); // Clear pagination
-                        return;
-                    }
-                        updatePagination(totalPages, page);
+                $("#pagination").html(""); // Clear pagination
+                tableBody.append("<tr><td colspan='8'>No users found.</td></tr>");
+                return;
+    }
 
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", status, error);
-                    }
-                });
-            }
+                if (users.length === 0) {
+                    tableBody.append("<tr><td colspan='8'>No users found.</td></tr>");
+                } else {
+                    $.each(users, function (i, obj) {
+                        let ban_string = obj.ban === 1 ? "Ban" : "Not Ban"; // Simplified conditional logic
+                        var row = `<tr>
+                            <td>${obj['user_id']}</td>
+                            <td>${obj.user_name}</td>
+                            <td>${obj.user_email}</td>
+                            <td>${obj.firstname}</td>
+                            <td>${obj.lastname}</td>
+                            <td>${obj.phone}</td>    
+                            <td style="color: ${getStatusColor(ban_string)}">${ban_string}</td>
+                            <td><input type="radio" name="rdo_user_id_${obj.user_id}" value="ban"></td>    
+                            <td><input type="radio" name="rdo_user_id_${obj.user_id}" value="unban"></td>                 
+                            <td><a href="#" class="one details-link" data-user-id="${obj.user_id}">Details</a></td>                  
+                        </tr>`;
+                        tableBody.append(row);
+                    });
+                }
+                updatePagination(totalPages, page);
+            })
+            .fail(function (xhr) {
+                alert("An error occurred: " + xhr.status + " " + xhr.statusText);
+            });
+    }
 
             // Function to update pagination links
         function updatePagination(totalPages, currentPage) {  

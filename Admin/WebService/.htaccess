@@ -1,0 +1,16 @@
+# Turn rewrite engine on
+#https://code.tutsplus.com/tutorials/using-htaccess-files-for-pretty-urls--net-6049
+
+
+Options +FollowSymlinks
+RewriteEngine on
+#RewriteCond %{SCRIPT_FILENAME} !-d
+#RewriteCond %{SCRIPT_FILENAME} !-f
+#Options -MultiViews
+
+# map neat URL to internal URL
+RewriteRule ^food/$   RestController.php?resource=food [nc,qsa]
+RewriteRule ^food$   RestController.php?resource=food [nc,qsa]
+
+RewriteRule ^food/([0-9]+)/$   RestController.php?resource=food&rid=$1 [nc,qsa]
+RewriteRule ^food/([0-9]+)$   RestController.php?resource=food&rid=$1 [nc,qsa]

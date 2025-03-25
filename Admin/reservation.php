@@ -30,51 +30,51 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Function to fetch reservations based on the selected filter
-            function fetchReservations(filter, page = 1) {
-                $.ajax({
-                    url: "fetch_filter_reservation.php",
-                    type: "GET",
-                    data: { filter: filter, page: page },
-                    dataType: "json",
-                    success: function(response) {
-                      var tableBody = $("#recent-reservations-table-body"); // Update the table body based on filter
-                        tableBody.empty(); // Clear existing rows
+        $(document).ready(function () {
+    var url = "http://localhost/Web/Admin/fetch_filter_reservation.php"; // Your PHP URL
+    var currentPage = 1; // Set the current page to 1 initially
 
-                        const { reservations, totalPages } = response;
+    // Function to fetch reservations based on filter and page
+    function fetchReservations(filter, page = 1) {
+        $.getJSON(url, { filter: filter, page: page }, function (data) {
+            if (data.reservations.length == 0) {
+                // No data available
+                $("div#recent-reservations-table-body").html("<tr><td colspan='8'>No reservations available.</td></tr>");
+            } else {
+                var reservations = data.reservations;
+                var totalPages = data.totalPages; // Assuming `totalPages` is sent from the server
 
-                        if (reservations.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No reservations found.</td></tr>");
-                        } else {
-                            $.each(reservations, function(index, reservation) {
-                                var row = `<tr>
-                                    <td>${reservation.reservation_id}</td>
-                                    <td>${reservation.reservation_name}</td>
-                                    <td>${reservation.reservation_phone}</td>
-                                    <td>${reservation.reservation_people}</td>
-                                    <td>${reservation.reservation_tables}</td>
-                                    <td>${reservation.reservation_date}</td>
-                                    <td>${reservation.reservation_time}</td>
-                                    <td>${reservation.reservation_note}</td>
-                                    <td>${reservation.user_id}</td> 
-                                    <td style="color: ${getStatusColor(reservation.status)}">${reservation.status}</td>
-                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="active"></td>
-                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="completed"></td>
-                                    <td><input type="radio" name="rdo_reservation_id_${reservation.reservation_id}" value="cancel"></td>
-                                    <td><a href="#" class="one details-link" data-user-id="${reservation.user_id}">Details</a></td>                   
-                                </tr>`;  
-                                tableBody.append(row);
-                            });
-                        }
-                        updatePagination(totalPages, page);
+                // Populate table rows dynamically
+                var tableBody = $("#recent-reservations-table-body");
+                tableBody.empty(); // Clear existing rows
 
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", status, error);
-                    }
+                $.each(reservations, function (key, entry) {
+                    var row = `<tr>
+                        <td>${entry.reservation_id}</td>
+                        <td>${entry.reservation_name}</td>
+                        <td>${entry.reservation_phone}</td>
+                        <td>${entry.reservation_people}</td>
+                        <td>${entry.reservation_tables}</td>
+                        <td>${entry.reservation_date}</td>
+                        <td>${entry.reservation_time}</td>
+                        <td>${entry.reservation_note}</td>
+                        <td>${entry.user_id}</td>
+                        <td style="color: ${getStatusColor(entry.status)}">${entry.status}</td>
+                        <td><input type="radio" name="rdo_reservation_id_${entry.reservation_id}" value="active"></td>
+                        <td><input type="radio" name="rdo_reservation_id_${entry.reservation_id}" value="completed"></td>
+                        <td><input type="radio" name="rdo_reservation_id_${entry.reservation_id}" value="cancel"></td>
+                        <td><a href="#" class="one details-link" data-user-id="${entry.user_id}">Details</a></td>
+                    </tr>`;
+                    tableBody.append(row);
                 });
+
+                // Update pagination links
+                updatePagination(totalPages, page);
             }
+        }).fail(function () {
+            console.error("Failed to fetch data from the server.");
+        });
+    }
 
             // Function to update pagination links
         function updatePagination(totalPages, currentPage) {  
@@ -194,6 +194,27 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
       box-shadow: 5px 5px 5px #eee;
       text-shadow: none;
     }
+
+    input[type=button] {
+    background: #FF0060;
+    color: white;
+    border-style: outset;
+    border-color: #FF0060;
+    height: 55px;
+    width: 150px;
+    border-radius: 40px;
+    font: arial,sans-serif;
+    text-shadow: none;
+    }
+    input[type=button]:hover {
+      background: #96033b;
+      color: #fff;
+      border: 1px solid #eee;
+      border-radius: 40px;
+      box-shadow: 5px 5px 5px #eee;
+      text-shadow: none;
+    }
+
     /* for link "details" */
     a.one:link {color:#6C9BCF;
     text-decoration: none;}
@@ -435,6 +456,9 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         </form>
         </div>
         <div id="pagination"></div>
+        <a href="WebServiceCallingAjax.php">
+    <input type="button" value="Manage Reservation">
+   </a>
         <!-- End of Recent Orders -->
       </main>
       <!-- End of Main Content -->

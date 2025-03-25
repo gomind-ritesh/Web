@@ -38,12 +38,25 @@ session_start();
            url: "includes/check_username.php", // The PHP file that will process the request
            type: "GET", // Using GET method to send data
            data: { username: username }, // Sending the username input
-           success: function(response) { // When the request is successful
+           error: function(xhr){
+              alert("An error occured: " + xhr.status + " " + xhr.statusText);
+          }
+        })
+
+          .done(function(data)
+          { 
+          if(data.msg == "error")
+          { $("#usernameHint").html("<span style='color: red;'>Username already taken</span>");}
+          else if(data.msg == "success")
+          {{ $("#usernameHint").html("<span style='color: green;'>Username available</span>");}}
+           //success: function(response) { // When the request is successful
              // Update the span with the returned hint message.
-             $("#usernameHint").html(response); // Update the span with the response
-           }
-         });
-       } else {
+          //    $("#usernameHint").html(response); // Update the span with the response
+          //  }
+          });
+       
+       
+        } else {
          $("#usernameHint").html("");
          //If the input field is empty, it clears the #usernameHint message.
          //This avoids showing old messages when the user deletes everything.
@@ -79,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
     {
       $username = test_input($_POST["txt_username"]);//call the test_input function on $_POST["txt_name"]
       
-      if (!preg_match("/^[a-zA-Z ]+$/",$username)) 
+      if (!preg_match("/^[a-zA-Z]+$/",$username)) 
       { //Use a regular expression to validate the name field
         $usernameErr = "Only letters and white space allowed";
       }else
@@ -123,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
     {
       $firstname = test_input($_POST["txt_firstname"]);
       
-      if (!preg_match("/^[a-zA-Z']+$/",$firstname)) 
+      if (!preg_match("/^[a-zA-Z]+$/",$firstname)) 
       { //Use a regular expression to validate the firstname field
         $firstnameErr = "Only letters and white space allowed";
       }
@@ -138,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
     {
       $lastname = test_input($_POST["txt_lastname"]);
       
-      if (!preg_match("/^[a-zA-Z' ]+$/",$lastname)) 
+      if (!preg_match("/^[a-zA-Z ]+$/",$lastname)) 
       { //Use a regular expression to validate the lastname field
         $lastnameErr = "Only letters and white space allowed";
       }
@@ -155,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
       
       if (!preg_match("/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/",$password))
       { //Use a regular expression to validate the password field
-        $passwordErr = "Password must contain one digit from 1 to 9, one lowercase letter, one uppercase letter, one special character, no space, and it must be 8-16 characters lnog.";
+        $passwordErr = "Password must contain one digit from 1 to 9, one lowercase letter, one uppercase letter, one special character, no space, and it must be 8-16 characters long.";
       }
       
     }//end else
@@ -170,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //check if the page is being invoked
       
       if (!preg_match("/^[0-9]{8}$/",$phone)) 
       { //Use a regular expression to validate the phone field
-        $phoneErr = "Password must contain 8 digits only";
+        $phoneErr = "Phone number must contain 8 digits only";
       }
       
     }//end else

@@ -1,10 +1,10 @@
 <?php
 require_once("dbcontroller.php");
 use Opis\JsonSchema\{
-    Validator, ValidationResult, ValidationError, Schema
+    Validator, ValidationResult, ValidationError,  Helper
 };
 
-require 'vendor/autoload.php';
+require '../../vendor/autoload.php';
 /* 
 A domain Class to demonstrate RESTful web services
 */
@@ -17,23 +17,27 @@ Class Reservation {
 		//die;
 		$data3 = json_decode($data2, false);
 
-        $schema = Schema::fromJsonString(file_get_contents(__DIR__ . '/schemas/FoodSchema.json'));
-        $validator = new Validator();
+        $testschema = Helper::toJSON(file_get_contents(__DIR__ . '/schemas/FoodSchema.json'));
+		$validator = new Validator();
+		$schema = $validator
+    	->loader()
+   		 ->loadObjectSchema((object)$testschema);
+   
 
         /** @var ValidationResult $result */
-        $result = $validator->schemaValidation($data3, $schema);
+        $result = $validator->validate($data3, $schema);
 
         if ($result->isValid()) {
             return true;
         } else {
             /** @var ValidationError $error */
-            $error = $result->getFirstError();
+            $error = $result->error();
             echo json_encode([
                 'success' => 0,
                 'message' => 'Invalid JSON data',
                 'error' => [
                     'keyword' => $error->keyword(),
-                    'args' => $error->keywordArgs()
+                    'args' => $error->args()
                 ]
             ]);
             return false;

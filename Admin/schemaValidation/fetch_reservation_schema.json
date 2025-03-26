@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "reservations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "reservation_id": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    },
+                    "reservation_name": { 
+                        "type": "string" 
+                    },
+                    "reservation_phone": { 
+                        "type": "integer", 
+                        "pattern": "^\\d{8}$" 
+                    },
+                    "reservation_people": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    },
+                    "reservation_tables": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    },
+                    "reservation_date": { 
+                        "type": "string", 
+                        "format": "date" 
+                    },
+                    "reservation_time": { 
+                        "type": "string", 
+                        "pattern": "^(\\d{2}):(\\d{2}):(\\d{2})$" 
+                    },
+                    "reservation_note": { 
+                        "type": "string" 
+                    },
+                    "status": { 
+                        "type": "string", 
+                        "enum": ["active", "completed"] 
+                    },
+                    "user_id": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    }
+                },
+                "required": [
+                    "reservation_id",
+                    "reservation_name",
+                    "reservation_phone",
+                    "reservation_people",
+                    "reservation_tables",
+                    "reservation_date",
+                    "reservation_time",
+                    "reservation_note",
+                    "status",
+                    "user_id"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "totalPages": { 
+            "type": "integer", 
+            "minimum": 1 
+        },
+        "additionalProperties": false
+    },
+    "required": ["reservations", "totalPages"]
+}

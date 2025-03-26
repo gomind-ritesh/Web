@@ -17,12 +17,8 @@ Class Reservation {
 		//die;
 		$data3 = json_decode($data2, false);
 
-        $testschema = Helper::toJSON(file_get_contents(__DIR__ . '/schemas/FoodSchema.json'));
-		$validator = new Validator();
-		$schema = $validator
-    	->loader()
-   		 ->loadObjectSchema((object)$testschema);
-   
+        $schema = Helper::toJSON(file_get_contents(__DIR__ . '/schemas/FoodSchema.json'));
+        $validator = new Validator();
 
         /** @var ValidationResult $result */
         $result = $validator->validate($data3, $schema);

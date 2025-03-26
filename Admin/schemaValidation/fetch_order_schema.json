@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "orders": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "user_name": { 
+                        "type": "string" 
+                    },
+                    "bill_id": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    },
+                    "total_price": { 
+                        "type": "number", 
+                        "pattern": "^[0-9.]+$" 
+                    },
+                    "status": { 
+                        "type": "string", 
+                        "enum": ["completed", "cancel", "active"] 
+                    },
+                    "bill_date": { 
+                        "type": "string", 
+                        "format": "date"   
+                    }
+                },
+                "required": [
+                    "user_name",
+                    "bill_id",
+                    "total_price",
+                    "status",
+                    "bill_date"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "totalPages": { 
+            "type": "integer", 
+            "minimum": 1 
+        },
+        "additionalProperties": false
+    },
+    "required": ["orders", "totalPages"]
+}

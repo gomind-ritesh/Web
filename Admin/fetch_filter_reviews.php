@@ -1,5 +1,14 @@
 <?php
 require_once "includes/db_connect.php";
+use Opis\JsonSchema\{
+    Validator, ValidationResult,Helper
+};
+use Opis\JsonSchema\Errors\{
+    ErrorFormatter,
+    ValidationError,
+};
+
+require '../vendor/autoload.php';
 
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'recent'; // Default filter
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -68,8 +77,31 @@ $stmt->bindParam(':perPage', $perPage, PDO::PARAM_INT);
 $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$data = json_encode((['reviews' => $reviews, 'totalPages' => $totalPages]), JSON_NUMERIC_CHECK);
+		
+$data1 = json_decode($data, false);
 
-header('Content-Type: application/json');
-echo json_encode(['reviews' => $reviews, 'totalPages' => $totalPages]);
+$loadschema = (file_get_contents(__DIR__ . '/schemaValidation/fetch_review_schema.json'));
+$validator = new Validator();
+
+/** @var ValidationResult $result */
+$result = $validator->validate($data1, $loadschema);
+
+if ($result->isValid()) {
+    header('Content-Type: application/json');
+    echo $data;
+} else {
+    $errorFormatter = new ErrorFormatter();
+    $error = $errorFormatter->format($result->error());
+    //$response->setStatusCode(400);
+    echo json_encode([
+        'result' => 'error',
+        'message' => 'Invalid response format',
+        'status' => 400,
+        'errors' => $error
+    ]);
+}
+// header('Content-Type: application/json');
+// echo json_encode(['reviews' => $reviews, 'totalPages' => $totalPages]);
 
 ?>

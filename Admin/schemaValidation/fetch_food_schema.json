@@ -1,0 +1,74 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "minItems": 1,
+    "uniqueItems": true,
+    "properties": {
+        "foodItems": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "food_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "food_name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "food_price": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "food_discount": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "food_description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                    },
+                    "food_category": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "food_type": {
+                        "type": "string",
+                        "enum": ["Veg", "Non-Veg"]
+                    },
+                    "food_source": {
+                        "type": "string"
+                    },
+                    "available": {
+                        "type": "integer",
+                        "enum": [0,1]
+                    }
+                },
+                "required": [
+                    "food_id",
+                    "food_name",
+                    "food_price",
+                    "food_discount",
+                    "food_description",
+                    "food_category",
+                    "food_type",
+                    "food_source",
+                    "available"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "totalPages": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "additionalProperties": false
+    },
+    "required":["foodItems","totalPages"]
+  }
+  

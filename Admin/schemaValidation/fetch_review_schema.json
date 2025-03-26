@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "reviews": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "review_id": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    },
+                    "review_comment": { 
+                        "type": "string" 
+                    },
+                    "review_rating": { 
+                        "type": "integer", 
+                        "minimum": 1, 
+                        "maximum": 5 
+                    },
+                    "user_name": { 
+                        "type": "string" 
+                    },
+                    "bill_date": { 
+                        "type": "string", 
+                        "format": "date" 
+                    },
+                    "bill_id": { 
+                        "type": "integer", 
+                        "minimum": 1 
+                    }
+                },
+                "required": [
+                    "review_id",
+                    "review_comment",
+                    "review_rating",
+                    "user_name",
+                    "bill_date",
+                    "bill_id"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "totalPages": { 
+            "type": "integer", 
+            "minimum": 1 
+        },
+        "additionalProperties": false
+
+    },
+    "required": ["reviews", "totalPages"]
+}

@@ -1,7 +1,7 @@
 <?php
 require_once "includes/db_connect.php";
 use Opis\JsonSchema\{
-    Validator, ValidationResult, Helper
+    Validator, ValidationResult,  Helper
 };
 use Opis\JsonSchema\Errors\{
     ErrorFormatter,
@@ -131,7 +131,7 @@ if ($result->isValid()) {
     $return_array['result'] = "success";
     $return_array['data']= $data;
     header('Content-Type: application/json');
-    echo $data;
+    echo $return_array;
 } else {
     $errorFormatter = new ErrorFormatter();
     $error = $errorFormatter->format($result->error());

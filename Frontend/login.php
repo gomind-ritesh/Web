@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if($userResults )//the user exists
     {
     	$hashed_password = $userResults['user_pwd'];
-      
+      if($userResults["ban"] == 0){
     	if(password_verify($userpassword,$hashed_password))
     	{
         echo 'password is valid';
@@ -58,6 +58,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	}
     	
     }
+    else
+    {
+      $Msg = "User ERROR: This account has been banned";
+    }
+  }
     else
     {
        $Msg = "User name ERROR: Your credentials seem to be wrong. Try again or make sure you are a registered user!";

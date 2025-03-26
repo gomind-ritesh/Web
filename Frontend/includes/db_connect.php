@@ -94,7 +94,7 @@ function retrieve_login($conn, $username)
 
 function retrieve_food($conn, $food_category ,$food_type)
 {
-    $sQuery = "SELECT * FROM food WHERE food_category = '$food_category' AND food_type = '$food_type'  ";
+    $sQuery = "SELECT * FROM food WHERE food_category = '$food_category' AND food_type = '$food_type' AND available = 1 ";
   	
   	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     

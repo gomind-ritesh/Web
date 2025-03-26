@@ -40,11 +40,22 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
-                    success: function(response) {
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                    }
+                })
+                    .done(function(response) {
                       var tableBody = $("#recent-orders-table-body"); // Update the table body based on filter
                         tableBody.empty(); // Clear existing rows
 
-                        const { orders, totalPages } = response;
+                        //const { orders, totalPages } = response;
+                        const { result, data } = response;
+
+                        if (result === "success") {
+
+                          const parsedData = JSON.parse(data); // Parse the nested JSON string
+                          const { orders, totalPages } = parsedData;
+                          
 
                         if (orders.length === 0) {
                     tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
@@ -65,12 +76,9 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                             });
                         }
                         updatePagination(totalPages, page);
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", status, error);
-                    }
-                });
+                        }
+                    });
+                    
             }
 
             // Function to update pagination links
@@ -164,13 +172,15 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                     url: 'fetch_bill_details.php',
                     type: 'GET',
                     data: { bill_id: billId },
-                    success: function (response) {
-                        $('#bill-details').html(response);
-                    },
                     error: function () {
                         alert('Error fetching bill details.');
                     }
-                });
+                  })
+                   .done(function (response) {
+                        $('#bill-details').html(response);
+                    });
+                    
+                
             });
     
     </script>

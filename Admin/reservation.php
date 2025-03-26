@@ -160,13 +160,14 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                     url: 'fetch_reservation_user_details.php',
                     type: 'GET',
                     data: { user_id: userId },
-                    success: function (response) {
-                        $('#userr-details').html(response);
-                    },
                     error: function () {
                         alert('Error fetching user details.');
                     }
-                });
+                })
+                    .done(function (response) {
+                        $('#userr-details').html(response);
+                    });
+                    
             });
     
     </script>

@@ -42,14 +42,22 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                     type: "GET",
                     data: { filter: filter, page: page },
                     dataType: "json",
-                    success: function(response) {
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                    }
+                })
+                    .done(function(response) {
                       var tableBody = $("#recent-food-table-body"); // Update the table body based on filter
                         tableBody.empty(); // Clear existing rows
 
-                        const { foodItems, totalPages } = response;
+                        const { result, data } = response;
 
+                        if (result === "success") {
+                          
+                          const parsedData = JSON.parse(data); // Parse the nested JSON string
+                          const { foodItems, totalPages } = parsedData;
                         if (foodItems.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No food found.</td></tr>");
+                      tableBody.append("<tr><td colspan='8'>No food found.</td></tr>");
                         } else {
                             $.each(foodItems, function(index, food) {
                               let available_string = food.available === 1 ? "Yes" : "No"; // Simplified conditional logic
@@ -70,12 +78,11 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                             });
                         }
                         updatePagination(totalPages, page);
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", status, error);
-                    }
-                });
+                      }
+                      else{
+                        tableBody.append("<tr><td colspan='8'>Encountered Error.</td></tr>");
+                      }
+                    });
             }
 
             // Function to update pagination links
@@ -168,13 +175,14 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
                     url: 'fetch_food_image.php',
                     type: 'GET',
                     data: { food_id: foodId },
-                    success: function (response) {
-                        $('#food-details').html(response);
-                    },
                     error: function () {
                         alert('Error fetching food image.');
                     }
-                });
+                })
+                .done(function (response) {
+                        $('#food-details').html(response);
+                    });
+                   
             });
 
             $(document).on("click", ".delete-link", function (event) {

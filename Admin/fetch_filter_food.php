@@ -131,7 +131,8 @@ if ($result->isValid()) {
     $return_array['result'] = "success";
     $return_array['data']= $data;
     header('Content-Type: application/json');
-    echo $data;
+    echo json_encode($return_array,JSON_PRETTY_PRINT);
+    // echo json_encode($return_array,JSON_PRETTY_PRINT);
 } else {
     $errorFormatter = new ErrorFormatter();
     $error = $errorFormatter->format($result->error());

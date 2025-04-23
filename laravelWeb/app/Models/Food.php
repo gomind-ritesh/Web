@@ -10,7 +10,7 @@ class Food extends Model
     /** @use HasFactory<\Database\Factories\FoodFactory> */
     use HasFactory;
     
-    protected $table = 'food'; // Important: table name is singular
+    // protected $table = 'food'; // Important: table name is singular
     protected $primaryKey = 'food_id';
     
     protected $fillable = [

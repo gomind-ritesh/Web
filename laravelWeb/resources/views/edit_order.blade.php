@@ -68,11 +68,11 @@
                 </select>
             </div>
             
-            <!-- Food Items Section -->
+            <!-- select food items -->
             <div class="form-group">
                 <label>Food Items</label>
                 <div id="food-items-container">
-                    <!-- Food items will be added here -->
+                    <!-- add food items -->
                     @if(old('food_items'))
                         @foreach(old('food_items') as $index => $item)
                             <div class="food-item">

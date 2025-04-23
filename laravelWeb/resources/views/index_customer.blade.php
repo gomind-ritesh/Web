@@ -36,7 +36,7 @@
         <td>{{ $customer->customer_id }}</td>
         <td>{{ $customer->customer_name }}</td>
         <td>{{ $customer->customer_email }}</td>
-        <td>********</td> <!-- Masked password for security -->
+        <td>********</td> <!-- hidden password for security -->
         <td>{{ $customer->customer_firstname }}</td>
         <td>{{ $customer->customer_lastname }}</td>
         <td>{{ $customer->phone }}</td>
@@ -58,6 +58,7 @@
     <p class="text-center">No customers found.</p>
   @endif
 </div>
+<!--pagination -->
 {{$customers->links()}}
 
 @endsection

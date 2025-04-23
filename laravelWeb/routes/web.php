@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
@@ -9,23 +10,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//    Route::get('/customers', [customerController::class, 'index'])->name('customers.index');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-//     Route::get('/customers/create',[customerController::class, 'create'])->name('customers.create');
-    
-//     Route::get('/customers/{customer}', [customerController::class, 'show'])->name('customers.show');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-//     Route::post('/customers', [customerController::class, 'store'])->name('customers.store');
+require __DIR__.'/auth.php';
 
+Route::resource('orders', OrderController::class)->middleware(['auth']);
 
-//    Route::get('/customers/{customer}/edit', [customerController::class, 'edit'])->name('customers.edit');
-    
-//    Route::delete('/customers/{customer}', [customerController::class, 'destroy'])->name('customers.destroy');
+Route::resource('customers', CustomerController::class)->middleware(['auth']);
 
-
-
-Route::resource('orders', OrderController::class);
-
-Route::resource('customers', CustomerController::class);
-
-Route::resource('foods', FoodController::class);
+Route::resource('foods', FoodController::class)->middleware(['auth']);

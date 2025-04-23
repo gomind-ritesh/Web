@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bill_foods', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Order::class,'bill_id');
-            $table->foreignIdFor(\App\Models\Food::class);
+            $table->foreignIdFor(\App\Models\Food::class,'food_id');
             $table->integer('item_qty');
             $table->timestamps();
         });

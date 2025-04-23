@@ -58,5 +58,6 @@
     <p class="text-center">No customers found.</p>
   @endif
 </div>
+{{$customers->links()}}
 
 @endsection

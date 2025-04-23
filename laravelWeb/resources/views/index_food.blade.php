@@ -63,5 +63,5 @@
     <a href="{{ route('foods.create') }}" class="btn btn-success">Add New Food Item</a>
   </div>
 </div>
-
+{{$foods->links()}}
 @endsection

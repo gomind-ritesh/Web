@@ -17,7 +17,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with(['customer', 'billFoods.food'])->get();
+        $orders = Order::with(['customer', 'billFoods.food'])->paginate(5);
         return view('index_order', ['orders' => $orders]);
     }
 

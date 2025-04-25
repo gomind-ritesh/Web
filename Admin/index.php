@@ -35,56 +35,87 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
         $(document).ready(function() {
             // Function to fetch orders based on the selected filter
             function fetchOrders(filter, page = 1) {
-                $.ajax({
-                    url: "fetch_filter_orders.php",
-                    type: "GET",
-                    data: { filter: filter, page: page },
-                    dataType: "json",
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error:", status, error);
-                    }
-                })
-                    .done(function(response) {
-                      var tableBody = $("#recent-orders-table-body"); // Update the table body based on filter
-                        tableBody.empty(); // Clear existing rows
-
-                        //const { orders, totalPages } = response;
-                        const { result, data } = response;
-
-                        if (result === "success") {
-
-                          const parsedData = JSON.parse(data); // Parse the nested JSON string
-                          const { orders, totalPages } = parsedData;
-                          
-
-                        if (orders.length === 0) {
-                    tableBody.append("<tr><td colspan='8'>No orders found.</td></tr>");
-                        } else {
-                            $.each(orders, function(index, bill) {
-                                var row = `<tr>
-                                    <td>${bill.user_name}</td>
-                                    <td>${bill.bill_id}</td>
-                                    <td>${bill.bill_date}</td>
-                                    <td>${bill.total_price}</td>
-                                    <td style="color: ${getStatusColor(bill.status)}">${bill.status}</td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="active"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="completed"></td>
-                                    <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="cancel"></td>
-                                    <td><a href="#" class="one details-link" data-bill-id="${bill.bill_id}">Details</a></td>                   
-                                </tr>`;  
-                                tableBody.append(row);
-                            });
-                        }
-                        updatePagination(totalPages, page);
-                        }
-                    });
-                    
+        $.ajax({
+            url: "fetch_filter_orders.php",
+            type: "GET",
+            data: { filter: filter, page: page },
+            dataType: "json",
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
             }
+        })
+        .done(function(response) {
+          $.ajax({
+                url: "validate_json_index.php",
+                type: "POST",
+                data: { json_data: JSON.stringify(response) },
+                dataType: "json"
+            })
+            .done(function(validationResponse) {
+                if (validationResponse.result === "success") {
+                    // Validation passed, process the data
+                    processOrderData(response, page);
+                } else {
+                    // Validation failed, handle the error
+                    console.error("Validation Error:", validationResponse.errors);
+                    alert("There was a problem with the data format. Please try again later.");
+                }
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Validation Request Failed:", status, error);
+            });
+        })
+        .fail(function(xhr, status, error) {
+            console.error("Orders Request Failed:", status, error);
+            $("#recent-orders-table-body").html("<tr><td colspan='9'>Failed to load orders. Please try again later.</td></tr>");
+        });
+    }
 
-            // Function to update pagination links
-        function updatePagination(totalPages, currentPage) {  
-        var pagination = $("#pagination");
-        pagination.empty();
+       // Function to process order data after validation
+       function processOrderData(response, currentPage) {
+        var tableBody = $("#recent-orders-table-body");
+        tableBody.empty(); // Clear existing rows
+
+        if (response.result === "success") {
+            try {
+                const parsedData = JSON.parse(response.data);
+                const { orders, totalPages } = parsedData;
+
+                if (orders.length === 0) {
+                    tableBody.append("<tr><td colspan='9'>No orders found.</td></tr>");
+                } else {
+                    $.each(orders, function(index, bill) {
+                        var row = `<tr>
+                            <td>${bill.user_name}</td>
+                            <td>${bill.bill_id}</td>
+                            <td>${bill.bill_date}</td>
+                            <td>${bill.total_price}</td>
+                            <td style="color: ${getStatusColor(bill.status)}">${bill.status}</td>
+                            <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="active"></td>
+                            <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="completed"></td>
+                            <td><input type="radio" name="rdo_bill_id_${bill.bill_id}" value="cancel"></td>
+                            <td><a href="#" class="one details-link" data-bill-id="${bill.bill_id}">Details</a></td>                   
+                        </tr>`;  
+                        tableBody.append(row);
+                    });
+                }
+                
+                // Update pagination
+                updatePagination(totalPages, currentPage);
+                
+            } catch (e) {
+                console.error("JSON Parse Error:", e);
+                tableBody.append("<tr><td colspan='9'>Error parsing data. Please try again later.</td></tr>");
+            }
+        } else {
+            tableBody.append("<tr><td colspan='9'>Error: " + (response.message || "Unknown error") + "</td></tr>");
+        }
+    }
+
+        // Function to update pagination links
+    function updatePagination(totalPages, currentPage) {  
+    var pagination = $("#pagination");
+    pagination.empty();
 
         const maxVisiblePages = 5; // Maximum number of page links to show at once
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));

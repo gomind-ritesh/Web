@@ -2,66 +2,59 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "result": {
-            "type": "string",
-            "enum": ["success"]
-        },
-        "data": {
-            "type": "string",
-            "description": "JSON string containing orders data that must conform to #/definitions/ordersData when parsed"
-        }
+      "result": {
+        "type": "string",
+        "enum": ["success"]
+      },
+      "data": {
+        "$ref": "#/definitions/data"
+      }
     },
     "required": ["result", "data"],
     "additionalProperties": false,
     "definitions": {
-        "ordersData": {
-            "type": "object",
-            "properties": {
-                "orders": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/orderItem"
-                    }
-                },
-                "totalPages": {
-                    "type": "integer",
-                    "minimum": 1
-                }
-            },
-            "required": ["orders", "totalPages"],
-            "additionalProperties": false
+      "data": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/orderItem"
+            }
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 1
+          }
         },
-        "orderItem": {
-            "type": "object",
-            "properties": {
-                "user_name": {
-                    "type": "string"
-                },
-                "bill_id": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "total_price": {
-                    "type": "number",
-                    "pattern": "^[0-9.]+$"
-                },
-                "status": {
-                    "type": "string",
-                    "enum": ["completed", "cancel", "active"]
-                },
-                "bill_date": {
-                    "type": "string",
-                    "format": "date"
-                }
-            },
-            "required": [
-                "user_name",
-                "bill_id",
-                "total_price",
-                "status",
-                "bill_date"
-            ],
-            "additionalProperties": false
-        }
+        "required": ["orders", "totalPages"],
+        "additionalProperties": false
+      },
+      "orderItem": {
+        "type": "object",
+        "properties": {
+          "user_name": {
+            "type": "string"
+          },
+          "bill_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "total_price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "completed", "cancel"]
+          },
+          "bill_date": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": ["user_name", "bill_id", "total_price", "status", "bill_date"],
+        "additionalProperties": false
+      }
     }
-}
+  }

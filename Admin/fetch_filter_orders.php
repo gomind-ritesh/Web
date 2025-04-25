@@ -86,6 +86,8 @@ $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
+$return_array = array("result"=>"", "data"=>"");
 $data = json_encode((['orders' => $orders, 'totalPages' => $totalPages]), JSON_NUMERIC_CHECK);
 		
 $data1 = json_decode($data, false);
@@ -98,7 +100,7 @@ $result = $validator->validate($data1, $loadschema);
 
 if ($result->isValid()) {
     $return_array['result'] = "success";
-    $return_array['data']= $data;
+    $return_array['data']= $data1;
     header('Content-Type: application/json');
     echo json_encode($return_array,JSON_PRETTY_PRINT);
 } else {

@@ -78,7 +78,8 @@ if(!isset($_SESSION['username']) || (!isset($_SESSION['admin'])))
 
         if (response.result === "success") {
             try {
-                const parsedData = JSON.parse(response.data);
+              console.log(response.data);
+                const parsedData = (response.data);
                 const { orders, totalPages } = parsedData;
 
                 if (orders.length === 0) {

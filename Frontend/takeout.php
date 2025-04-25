@@ -6,10 +6,27 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-function fetch_menu_data($category, $type) {
-    $url = "http://localhost/Web/Frontend/includes/retrieve_food.php?category=$category&type=$type";
-    $response = file_get_contents($url); // Fetch JSON data from the separate file
-    return json_decode($response, true); // Decode JSON into an array
+function fetch_all_food_data() {
+    $url = "http://localhost/Web/Frontend/includes/retrieve_food.php"; // Path to the JSON file
+    $response = @file_get_contents($url);
+    if ($response === false) {
+        error_log("Failed to fetch data from URL: " . $url);
+        return null;
+    }
+
+    $data = json_decode($response, true);
+    if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON decoding failed: " . json_last_error_msg());
+        return null;
+    }
+
+    return $data;
+}
+
+// Fetch all food data
+$foods = fetch_all_food_data();
+if ($foods === null) {
+    die("<p>Error: Could not retrieve menu data. Please try again later.</p>");
 }
 
 $categories = [
@@ -19,9 +36,7 @@ $categories = [
     ['category' => 'Main course', 'type' => 'Veg'],
     ['category' => 'Dessert', 'type' => 'Veg']
 ];
-?>
-
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -30,9 +45,13 @@ $categories = [
     <link rel="stylesheet" href="css/mystyle.css">
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <?php 
+        $activemenu = "takeout";
+        include('includes/navbar.php');
+    ?>
 </head>
 <body>
-    <?php include('includes/navbar.php'); ?>
 
     <div class="margin">
         <header class="top">
@@ -62,14 +81,18 @@ $categories = [
 
         <main>
             <?php foreach ($categories as $category): ?>
-                <h2 class="heading"><?= $category['category'] ?> -- <?= $category['type'] ?></h2>
+                <h2 class="heading"><?= htmlspecialchars($category['category']) ?> -- <?= htmlspecialchars($category['type']) ?></h2>
                 <div class="menu_list">
                     <?php
-                    $foods = fetch_menu_data($category['category'], $category['type']);
-                    if (isset($foods['error'])) {
-                        echo "<p>Error: " . htmlspecialchars($foods['error']) . "</p>";
+                    // Filter food items based on category and type
+                    $filteredFoods = array_filter($foods, function ($food) use ($category) {
+                        return $food['food_category'] === $category['category'] && $food['food_type'] === $category['type'];
+                    });
+
+                    if (empty($filteredFoods)) {
+                        echo "<p>No items found for this category and type.</p>";
                     } else {
-                        foreach ($foods as $food): ?>
+                        foreach ($filteredFoods as $food): ?>
                             <div class="menu_items">
                                 <img src="<?= htmlspecialchars($food['food_source']) ?>" alt="<?= htmlspecialchars($food['food_name']) ?>">
                                 <h4 class="item_title"><?= htmlspecialchars($food['food_name']) ?></h4>
@@ -101,7 +124,7 @@ $categories = [
             </div>
         </div>
     </div>
-
+    <script src="takeout.js"></script>
     <?php include('includes/footer.php'); ?>
 </body>
 </html>

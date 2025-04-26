@@ -2,8 +2,8 @@
 class DBController {
 	private $conn = "";
 	private $host = "localhost";
-	private $user = "ritesh";
-	private $password = "1277";
+	private $user = "root";
+	private $password = "";
 	private $database = "red_lantern";
 
 	function __construct() {

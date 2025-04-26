@@ -16,10 +16,13 @@
     }
     .remove-food {
         position: absolute;
-        top: 10px;
+        top: 5px;
         right: 10px;
         cursor: pointer;
         color: red;
+        font-size: 24px; 
+        font-weight: bold;
+
     }
     .add-food-btn {
         margin-bottom: 20px;

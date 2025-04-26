@@ -22,6 +22,8 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+
+
 Route::resource('orders', OrderController::class)->middleware(['auth']);
 
 Route::resource('customers', CustomerController::class)->middleware(['auth']);

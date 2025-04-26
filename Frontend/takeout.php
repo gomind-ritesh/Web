@@ -32,8 +32,8 @@ if ($foods === null) {
 $categories = [
     ['category' => 'Appetizer', 'type' => 'Non-Veg'],
     ['category' => 'Appetizer', 'type' => 'Veg'],
-    ['category' => 'Main course', 'type' => 'Non-Veg'],
-    ['category' => 'Main course', 'type' => 'Veg'],
+    ['category' => 'Main Course', 'type' => 'Non-Veg'],
+    ['category' => 'Main Course', 'type' => 'Veg'],
     ['category' => 'Dessert', 'type' => 'Veg']
 ];
 ?><!DOCTYPE html>
